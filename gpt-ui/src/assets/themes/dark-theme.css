@@ -1,0 +1,57 @@
+:root[data-theme='dark'] {
+  /* Couleurs principales */
+  --primary-color: #1a1a1a;
+  --secondary-color: #2d2d2d;
+  --accent-color: #64b5f6;
+
+  /* Couleurs de texte */
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #808080;
+
+  /* Couleurs de fond */
+  --background-primary: #1a1a1a;
+  --background-secondary: #2d2d2d;
+  --background-tertiary: #404040;
+
+  /* Couleurs de bordure */
+  --border-color: #404040;
+  --border-color-hover: #505050;
+
+  /* Couleurs d'état */
+  --success-color: #66bb6a;
+  --warning-color: #ffa726;
+  --error-color: #ef5350;
+  --info-color: #42a5f5;
+
+  /* Couleurs de chat */
+  --user-message-bg: #2d2d2d;
+  --ai-message-bg: #1a1a1a;
+  --tag-bg: #404040;
+  --tag-text: #ffffff;
+  --hover-bg: #404040;
+  --active-bg: #64b5f6;
+  --active-text: #ffffff;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+
+  /* Espacement */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Rayons de bordure */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}

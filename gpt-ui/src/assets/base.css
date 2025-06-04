@@ -15,7 +15,7 @@
   --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
   --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
 
-  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-1: var(--vt-c-black-soft);
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
@@ -31,14 +31,14 @@
   --color-border-hover: var(--vt-c-divider-light-1);
 
   --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-black-soft);
 
   --section-gap: 160px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: var(--vt-c-black);
+    --color-background: var(--vt-c-white);
     --color-background-soft: var(--vt-c-black-soft);
     --color-background-mute: var(--vt-c-black-mute);
 
@@ -60,7 +60,6 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
   background: var(--color-background);
   transition:
     color 0.5s,
@@ -83,4 +82,67 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+strong {
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(60, 60, 60, 0.06);
+}
+
+thead {
+  background: #f5f6fa;
+}
+
+th,
+td {
+  padding: 0.75em 1em;
+  text-align: left;
+  border-bottom: 1px solid #ececec;
+}
+
+th {
+  font-weight: 600;
+  color: #2c3e50;
+  background: #f5f6fa;
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #f0f4fa;
+  transition: background 0.2s;
+}
+
+@media (prefers-color-scheme: dark) {
+  table {
+    background: #23272f;
+    color: #e6e6e6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  }
+  thead {
+    background: #23272f;
+  }
+  th {
+    color: #e6e6e6;
+    background: #23272f;
+  }
+  td {
+    border-bottom: 1px solid #353b45;
+  }
+  tbody tr:hover {
+    background: #2a2f38;
+  }
 }
