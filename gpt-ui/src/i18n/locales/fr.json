@@ -1,1 +1,45 @@
-{}
+{
+  "app": {
+    "title": "SHOSHIZAN"
+  },
+  "sidebar": {
+    "newConversation": "Nouvelle conversation",
+    "emptyConversation": "Conversation vide",
+    "user": "Utilisateur",
+    "online": "En ligne",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{count}} jours",
+    "help": "Comment puis-je vous aider ?"
+  },
+  "userInput": {
+    "placeholder": "Tapez votre message ici...",
+    "regenerate": "Régénérer la réponse",
+    "sending": "En cours de réponse...",
+    "errorSend": "Échec de l'envoi du message :",
+    "errorRegenerate": "Échec de la régénération de la réponse :"
+  },
+  "conversation": {
+    "assistant": "AI",
+    "streaming": "En cours...",
+    "error": "Désolé, une erreur est survenue. Veuillez réessayer.",
+    "errorRegenerate": "Désolé, une erreur est survenue lors de la régénération."
+  },
+  "theme": {
+    "switchToDark": "Passer en mode sombre",
+    "switchToLight": "Passer en mode clair"
+  },
+  "model": {
+    "label": "Modèle"
+  },
+  "defaults": {
+    "conversationTitle": "Nouvelle conversation",
+    "userName": "Utilisateur"
+  },
+  "api": {
+    "conversationIdRequired": "L'identifiant de la conversation est requis",
+    "noResponseBody": "Aucune réponse reçue d'Ollama",
+    "failedToGetResponse": "Échec de la récupération de la réponse depuis Ollama : {{error}}",
+    "errorParsingChunk": "Erreur lors de l'analyse du flux :"
+  }
+}

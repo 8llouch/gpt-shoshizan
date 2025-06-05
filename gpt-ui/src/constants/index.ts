@@ -82,10 +82,26 @@ export const VALIDATION = {
   USERNAME_MAX_LENGTH: 50,
 } as const
 
+export const MODELS = {
+  LLAMA_3_2: 'llama3.2',
+  GEMMA_3: 'gemma3:4b',
+  LLAVA: 'llava',
+  DEEPSEEK: 'deepseek-r1',
+  CLAUDE: 'incept5/llama3.1-claude:latest',
+} as const
+
+export const MODEL_OPTIONS = [
+  { text: 'llama3.2', value: 'llama3.2' },
+  { text: 'gemma3', value: 'gemma3:4b' },
+  { text: 'llava', value: 'llava' },
+  { text: 'deepseek', value: 'deepseek-r1' },
+  { text: 'claude', value: 'incept5/llama3.1-claude:latest' },
+] as const
+
 export const DEFAULTS = {
   CONVERSATION_TITLE: 'Nouvelle conversation',
   USER_NAME: 'Utilisateur',
-  MODEL: 'gpt-3.5-turbo',
+  MODEL: 'llama3.2',
   TEMPERATURE: 0.7,
   MAX_TOKENS: 2048,
   LANGUAGE: 'fr-FR',

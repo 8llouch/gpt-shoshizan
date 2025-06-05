@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '../../stores/themeStore'
 
+const { t } = useI18n()
 const themeStore = useThemeStore()
 
 defineOptions({
@@ -14,7 +16,7 @@ defineOptions({
       class="theme-button"
       @click="themeStore.toggleTheme()"
       :title="
-        themeStore.currentTheme === 'light' ? 'Passer en mode sombre' : 'Passer en mode clair'
+        themeStore.currentTheme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')
       "
     >
       <span v-if="themeStore.currentTheme === 'light'" class="icon">🌙</span>

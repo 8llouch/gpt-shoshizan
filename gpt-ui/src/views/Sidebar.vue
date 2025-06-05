@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Conversation {
   id: string
@@ -12,10 +15,10 @@ const isOpen = ref(false)
 const conversations = ref<Conversation[]>([
   {
     id: '1',
-    title: 'Nouvelle conversation',
-    lastMessage: 'Comment puis-je vous aider ?',
-    timestamp: new Date()
-  }
+    title: t('sidebar.newConversation'),
+    lastMessage: t('sidebar.help'),
+    timestamp: new Date(),
+  },
 ])
 
 const toggleSidebar = () => {
@@ -25,9 +28,9 @@ const toggleSidebar = () => {
 const startNewConversation = () => {
   const newConv: Conversation = {
     id: Date.now().toString(),
-    title: 'Nouvelle conversation',
+    title: t('sidebar.newConversation'),
     lastMessage: '',
-    timestamp: new Date()
+    timestamp: new Date(),
   }
   conversations.value.unshift(newConv)
 }
@@ -36,9 +39,9 @@ const formatDate = (date: Date) => {
   const now = new Date()
   const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
 
-  if (diffDays === 0) return 'Aujourd\'hui'
-  if (diffDays === 1) return 'Hier'
-  if (diffDays < 7) return `Il y a ${diffDays} jours`
+  if (diffDays === 0) return t('sidebar.today')
+  if (diffDays === 1) return t('sidebar.yesterday')
+  if (diffDays < 7) return t('sidebar.daysAgo', { count: diffDays })
   return date.toLocaleDateString('fr-FR')
 }
 </script>
@@ -58,12 +61,12 @@ const formatDate = (date: Date) => {
           <div class="logo">
             <span class="logo-text">GPT</span>
           </div>
-          <h3 class="app-title">SHOSHIZAN</h3>
+          <h3 class="app-title">{{ t('app.title') }}</h3>
         </div>
 
         <button @click="startNewConversation" class="new-chat-btn">
           <span class="plus-icon">+</span>
-          Nouvelle conversation
+          {{ t('sidebar.newConversation') }}
         </button>
       </header>
 
@@ -76,7 +79,9 @@ const formatDate = (date: Date) => {
           >
             <div class="conversation-content">
               <h4 class="conversation-title">{{ conversation.title }}</h4>
-              <p class="conversation-preview">{{ conversation.lastMessage || 'Conversation vide' }}</p>
+              <p class="conversation-preview">
+                {{ conversation.lastMessage || t('sidebar.emptyConversation') }}
+              </p>
               <span class="conversation-date">{{ formatDate(conversation.timestamp) }}</span>
             </div>
             <button class="conversation-menu">⋮</button>
@@ -88,18 +93,12 @@ const formatDate = (date: Date) => {
         <div class="user-section">
           <div class="user-avatar">👤</div>
           <div class="user-info">
-            <span class="user-name">Utilisateur</span>
-            <span class="user-status">En ligne</span>
+            <span class="user-name">{{ t('sidebar.user') }}</span>
+            <span class="user-status">{{ t('sidebar.online') }}</span>
           </div>
         </div>
       </footer>
     </aside>
-
-    <div
-      v-if="isOpen"
-      @click="toggleSidebar"
-      class="mobile-overlay md:hidden"
-    ></div>
   </div>
 </template>
 
@@ -110,19 +109,6 @@ const formatDate = (date: Date) => {
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.mobile-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: var(--button-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 0.5rem;
-  font-size: 18px;
-  cursor: pointer;
-  z-index: 60;
 }
 
 .sidebar-header {
@@ -296,16 +282,6 @@ const formatDate = (date: Date) => {
 .user-status {
   font-size: 12px;
   color: var(--success-color);
-}
-
-.mobile-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 40;
 }
 
 .conversations-section::-webkit-scrollbar {

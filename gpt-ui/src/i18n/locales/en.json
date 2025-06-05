@@ -1,1 +1,45 @@
-{}
+{
+  "app": {
+    "title": "SHOSHIZAN"
+  },
+  "sidebar": {
+    "newConversation": "New conversation",
+    "emptyConversation": "Empty conversation",
+    "user": "User",
+    "online": "Online",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "help": "How can I help you?"
+  },
+  "userInput": {
+    "placeholder": "Type your message here...",
+    "regenerate": "Regenerate response",
+    "sending": "Responding...",
+    "errorSend": "Failed to send message:",
+    "errorRegenerate": "Failed to regenerate response:"
+  },
+  "conversation": {
+    "assistant": "AI",
+    "streaming": "Streaming...",
+    "error": "Sorry, an error occurred. Please try again.",
+    "errorRegenerate": "Sorry, an error occurred while regenerating."
+  },
+  "theme": {
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
+  },
+  "model": {
+    "label": "Model"
+  },
+  "defaults": {
+    "conversationTitle": "New conversation",
+    "userName": "User"
+  },
+  "api": {
+    "conversationIdRequired": "Conversation ID is required",
+    "noResponseBody": "No response received from Ollama",
+    "failedToGetResponse": "Failed to get response from Ollama: {{error}}",
+    "errorParsingChunk": "Error parsing stream:"
+  }
+}

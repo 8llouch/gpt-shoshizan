@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 export type Theme = 'light' | 'dark' | 'auto'
 
-export const useThemeStore = defineStore('theme', () => {
+export const useThemeStore = defineStore('themeStore', () => {
   const currentTheme = ref<Theme>('light')
 
+  const getCurrentTheme = computed(() => currentTheme.value)
+
   const setTheme = (theme: Theme) => {
-    console.log('🎨 Setting theme to:', theme)
     currentTheme.value = theme
     localStorage.setItem('theme', theme)
     applyTheme(theme)
@@ -15,13 +16,11 @@ export const useThemeStore = defineStore('theme', () => {
 
   const toggleTheme = () => {
     const newTheme = currentTheme.value === 'light' ? 'dark' : 'light'
-    console.log('🔄 Toggling theme from', currentTheme.value, 'to', newTheme)
     setTheme(newTheme)
   }
 
   const applyTheme = (theme: Theme) => {
     const root = document.documentElement
-    console.log('📝 Applying theme:', theme)
 
     root.classList.remove('dark', 'light')
 
@@ -29,10 +28,8 @@ export const useThemeStore = defineStore('theme', () => {
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const appliedTheme = systemPrefersDark ? 'dark' : 'light'
       root.classList.add(appliedTheme)
-      console.log('🖥️ Auto theme resolved to:', appliedTheme)
     } else {
       root.classList.add(theme)
-      console.log('✅ Applied theme class:', theme)
     }
 
     updateGlobalStyles()
@@ -49,13 +46,10 @@ export const useThemeStore = defineStore('theme', () => {
         ? 'var(--background-primary)'
         : 'var(--background-primary)'
     }, 50)
-
-    console.log('🎨 Updated global styles for', isDark ? 'dark' : 'light', 'theme')
   }
 
   const initTheme = () => {
     const savedTheme = localStorage.getItem('theme') as Theme
-    console.log('🚀 Initializing theme. Saved theme:', savedTheme)
 
     if (savedTheme && ['light', 'dark', 'auto'].includes(savedTheme)) {
       setTheme(savedTheme)
@@ -66,6 +60,7 @@ export const useThemeStore = defineStore('theme', () => {
 
   return {
     currentTheme,
+    getCurrentTheme,
     setTheme,
     toggleTheme,
     initTheme,

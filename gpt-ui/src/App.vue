@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useChatStore } from './stores/chat'
+import { useChatStore } from './stores/chatStore'
+import { useApiStore } from './stores/apiStore'
 import GptLayout from './views/GptLayout.vue'
 import Sidebar from './views/Sidebar.vue'
 import ConversationComponent from './views/ConversationComponent.vue'
 import UserInputComponent from './views/UserInputComponent.vue'
 import ThemeProvider from './components/base/ThemeProvider.vue'
 import ThemeSwitcher from './components/base/ThemeSwitcher.vue'
+import ModelSelector from './components/base/ModelSelector.vue'
 
 const chatStore = useChatStore()
+const apiStore = useApiStore()
 
 onMounted(() => {
   chatStore.initializeStore()
@@ -30,10 +33,13 @@ const handleRegenerateResponse = () => {
         <template #sidebar>
           <Sidebar />
         </template>
+        <template #header>
+          <ModelSelector />
+        </template>
         <template #conversation>
           <ConversationComponent
             :messages="chatStore.currentMessages"
-            :is-loading="chatStore.isLoading"
+            :is-loading="apiStore.isLoading || apiStore.isStreaming"
           />
         </template>
         <template #user-input>
@@ -49,18 +55,20 @@ const handleRegenerateResponse = () => {
 </template>
 
 <style>
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
-
 </style>
 
 <style scoped>

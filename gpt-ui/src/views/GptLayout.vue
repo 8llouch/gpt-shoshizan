@@ -6,6 +6,9 @@
       <slot name="sidebar"></slot>
     </div>
     <div class="gpt-main">
+      <div class="gpt-header">
+        <slot name="header"></slot>
+      </div>
       <div class="gpt-conversation">
         <slot name="conversation"></slot>
       </div>
@@ -44,6 +47,17 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+}
+
+.gpt-header {
+  flex-shrink: 0;
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 60px;
 }
 
 .gpt-conversation {
