@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useApiStore } from './apiStore'
+import { useModelStore } from './modelStore'
 import type { Message, Conversation } from '@/types'
 
-export const useChatStore = defineStore('chat', () => {
+export const useChatStore = defineStore('chatStore', () => {
   const conversations = ref<Conversation[]>([])
   const currentConversationId = ref<string | null>(null)
-  const isLoading = ref(false)
 
   const currentConversation = computed(() => {
     if (!currentConversationId.value) return null
@@ -13,16 +14,16 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   const currentMessages = computed(() => {
-    return currentConversation.value?.messages || []
+    const current = conversations.value.find((conv) => conv.id === currentConversationId.value)
+    return current?.messages || []
   })
 
   const createConversation = (): Conversation => {
     const newConversation: Conversation = {
       id: Date.now().toString(),
       title: 'Nouvelle conversation',
-      lastMessage: '',
-      timestamp: new Date(),
       messages: [],
+      responses: [],
     }
 
     conversations.value.unshift(newConversation)
@@ -30,7 +31,12 @@ export const useChatStore = defineStore('chat', () => {
     return newConversation
   }
 
-  const addMessage = (conversationId: string, content: string, role: 'user' | 'assistant') => {
+  const addMessage = (
+    conversationId: string,
+    content: string,
+    role: 'user' | 'assistant',
+    modelName?: string,
+  ) => {
     const conversation = conversations.value.find((conv) => conv.id === conversationId)
     if (!conversation) return
 
@@ -38,7 +44,8 @@ export const useChatStore = defineStore('chat', () => {
       id: Date.now().toString(),
       content,
       role,
-      timestamp: new Date(),
+      timestamp: Date.now(),
+      modelName: modelName || undefined,
     }
 
     if (!conversation.messages) {
@@ -46,8 +53,6 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     conversation.messages.push(message)
-    conversation.lastMessage = content
-    conversation.timestamp = new Date()
 
     if (role === 'user' && conversation.messages.length === 1) {
       conversation.title = content.length > 30 ? content.substring(0, 30) + '...' : content
@@ -64,22 +69,31 @@ export const useChatStore = defineStore('chat', () => {
 
     addMessage(conversation.id, content, 'user')
 
-    isLoading.value = true
+    const apiStore = useApiStore()
+    const modelStore = useModelStore()
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const result = await apiStore.sendMessage(content, conversation.id)
 
-      const response = generateMockResponse(content)
-      addMessage(conversation.id, response, 'assistant')
+      // Only add the assistant message when we have the complete response
+      if (apiStore.currentResponse) {
+        addMessage(
+          conversation.id,
+          apiStore.currentResponse,
+          'assistant',
+          modelStore.selectedModelName,
+        )
+      } else if (result && result.response) {
+        addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
+      }
     } catch (error) {
       console.error('Error sending message:', error)
       addMessage(
         conversation.id,
         'Désolé, une erreur est survenue. Veuillez réessayer.',
         'assistant',
+        modelStore.selectedModelName,
       )
-    } finally {
-      isLoading.value = false
     }
   }
 
@@ -97,26 +111,38 @@ export const useChatStore = defineStore('chat', () => {
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop()
     if (!lastUserMessage) return
 
-    isLoading.value = true
+    const apiStore = useApiStore()
+    const modelStore = useModelStore()
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      const response = generateMockResponse(lastUserMessage.content)
-      addMessage(conversation.id, response, 'assistant')
+      const result = await apiStore.sendMessage(lastUserMessage.content, conversation.id)
+
+      // Only add the assistant message when we have the complete response
+      if (apiStore.currentResponse) {
+        addMessage(
+          conversation.id,
+          apiStore.currentResponse,
+          'assistant',
+          modelStore.selectedModelName,
+        )
+      } else if (result && result.response) {
+        addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
+      }
     } catch (error) {
       console.error('Error regenerating response:', error)
       addMessage(
         conversation.id,
         'Désolé, une erreur est survenue lors de la régénération.',
         'assistant',
+        modelStore.selectedModelName,
       )
-    } finally {
-      isLoading.value = false
     }
   }
 
   const selectConversation = (conversationId: string) => {
     currentConversationId.value = conversationId
+    const apiStore = useApiStore()
+    apiStore.clearContext()
   }
 
   const deleteConversation = (conversationId: string) => {
@@ -131,31 +157,6 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  const generateMockResponse = (userMessage: string): string => {
-    const responses = [
-      'Je comprends votre question. Voici ma réponse basée sur les informations que vous avez fournies.',
-      "C'est une excellente question ! Laissez-moi vous expliquer en détail.",
-      'Je vais vous aider avec cela. Voici ce que je recommande :',
-      'Bonne question ! Voici mon analyse de la situation :',
-      'Je peux certainement vous aider avec ça. Voici quelques points importants à considérer :',
-    ]
-
-    if (userMessage.toLowerCase().includes('code')) {
-      return "Voici un exemple de code qui devrait résoudre votre problème :\n\n```javascript\nconst solution = () => {\n  console.log('Hello World!');\n};\n```\n\nCette approche est recommandée car elle est simple et efficace."
-    }
-
-    if (userMessage.toLowerCase().includes('help') || userMessage.toLowerCase().includes('aide')) {
-      return "Je suis là pour vous aider ! Voici comment je peux vous assister :\n\n1. Répondre à vos questions\n2. Expliquer des concepts complexes\n3. Vous aider avec du code\n4. Analyser des problèmes\n\nN'hésitez pas à me poser toute question spécifique."
-    }
-
-    return (
-      responses[Math.floor(Math.random() * responses.length)] +
-      '\n\nVotre message était : "' +
-      userMessage +
-      '"'
-    )
-  }
-
   const initializeStore = () => {
     if (conversations.value.length === 0) {
       createConversation()
@@ -165,11 +166,8 @@ export const useChatStore = defineStore('chat', () => {
   return {
     conversations,
     currentConversationId,
-    isLoading,
-
     currentConversation,
     currentMessages,
-
     createConversation,
     addMessage,
     sendMessage,
