@@ -1,0 +1,15 @@
+{
+  "name": "@shoshizan/shared-interfaces",
+  "version": "1.0.0",
+  "description": "Shared interfaces for Shoshizan applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
