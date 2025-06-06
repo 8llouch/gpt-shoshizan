@@ -2,6 +2,7 @@ import type { ApiRequest, ApiResponse } from '@/types'
 
 export class ApiService {
   private static readonly API_URL = 'http://localhost:11434/api/generate'
+  private static readonly KAFKA_PRODUCER_URL = 'http://localhost:3000/ai-inputs'
 
   static async sendRequest(
     request: ApiRequest,
@@ -59,11 +60,24 @@ export class ApiService {
             context = data.context
           }
           if (data.done) {
-            return {
+            const apiResponse = {
               response: fullResponse,
               done: true,
               context: context,
             }
+            try {
+              await fetch(ApiService.KAFKA_PRODUCER_URL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+              })
+            } catch (err) {
+              console.error('Error sending message to kafka producer:', err)
+            }
+
+            return apiResponse
           }
         } catch (e) {
           console.error('Error parsing chunk:', e)
