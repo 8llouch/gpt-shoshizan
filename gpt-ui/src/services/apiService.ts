@@ -1,8 +1,11 @@
-import type { ApiRequest, ApiResponse } from '@/types'
+import type { ApiRequest, ApiResponse } from '@shoshizan/shared-interfaces'
 
 export class ApiService {
-  private static readonly API_URL = 'http://localhost:11434/api/generate'
-  private static readonly KAFKA_PRODUCER_URL = 'http://localhost:3000/ai-inputs'
+  private static readonly LLM_API_URL = 'http://localhost:11434/api/generate'
+  private static readonly KAFKA_PRODUCER_URL_INPUTS =
+    'http://localhost:3000/message-producer/ai-inputs'
+  private static readonly KAFKA_PRODUCER_URL_RESPONSE =
+    'http://localhost:3000/message-producer/ai-outputs'
 
   static async sendRequest(
     request: ApiRequest,
@@ -12,18 +15,20 @@ export class ApiService {
       throw new Error('conversationId is required')
     }
 
-    const ollamaResponse = await fetch(ApiService.API_URL, {
+    const { model, prompt, context, system, options } = request
+
+    const ollamaResponse = await fetch(ApiService.LLM_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: request.model,
-        prompt: request.prompt,
+        model,
+        prompt,
         stream: true,
-        context: request.context,
-        system: request.system,
-        options: request.options,
+        context,
+        system,
+        options,
       }),
     })
 
@@ -36,7 +41,7 @@ export class ApiService {
     }
 
     let fullResponse = ''
-    let context: number[] | undefined
+    let contextLlm: number[] | undefined
     const reader = ollamaResponse.body.getReader()
     const decoder = new TextDecoder()
 
@@ -57,21 +62,36 @@ export class ApiService {
             }
           }
           if (data.context) {
-            context = data.context
+            contextLlm = data.context
           }
           if (data.done) {
             const apiResponse = {
               response: fullResponse,
               done: true,
-              context: context,
+              context: contextLlm,
             }
             try {
-              await fetch(ApiService.KAFKA_PRODUCER_URL, {
+              await fetch(ApiService.KAFKA_PRODUCER_URL_INPUTS, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(request),
+              })
+              const responseMessage = {
+                ...apiResponse,
+                conversationId: request.conversationId,
+                model: request.model,
+                prompt: request.prompt,
+                system: request.system,
+                options: request.options,
+              }
+              await fetch(ApiService.KAFKA_PRODUCER_URL_RESPONSE, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(responseMessage),
               })
             } catch (err) {
               console.error('Error sending message to kafka producer:', err)
@@ -88,7 +108,7 @@ export class ApiService {
     return {
       response: fullResponse,
       done: false,
-      context: context,
+      context: contextLlm,
     }
   }
 }

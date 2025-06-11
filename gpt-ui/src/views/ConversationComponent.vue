@@ -4,7 +4,7 @@ import { marked } from 'marked'
 import { useI18n } from 'vue-i18n'
 import { useApiStore } from '../stores/apiStore'
 import { useModelStore } from '../stores/modelStore'
-import type { Message } from '../types'
+import type { Message } from '@shoshizan/shared-interfaces'
 
 const { t } = useI18n()
 

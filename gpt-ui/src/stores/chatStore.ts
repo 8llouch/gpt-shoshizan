@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApiStore } from './apiStore'
 import { useModelStore } from './modelStore'
-import type { Message, Conversation } from '@/types'
+import type { Message, Conversation } from '@shoshizan/shared-interfaces'
 
 export const useChatStore = defineStore('chatStore', () => {
   const conversations = ref<Conversation[]>([])
@@ -21,7 +21,6 @@ export const useChatStore = defineStore('chatStore', () => {
   const createConversation = (): Conversation => {
     const newConversation: Conversation = {
       id: Date.now().toString(),
-      title: 'Nouvelle conversation',
       messages: [],
       responses: [],
     }
@@ -53,10 +52,6 @@ export const useChatStore = defineStore('chatStore', () => {
     }
 
     conversation.messages.push(message)
-
-    if (role === 'user' && conversation.messages.length === 1) {
-      conversation.title = content.length > 30 ? content.substring(0, 30) + '...' : content
-    }
   }
 
   const sendMessage = async (content: string) => {
@@ -75,7 +70,6 @@ export const useChatStore = defineStore('chatStore', () => {
     try {
       const result = await apiStore.sendMessage(content, conversation.id)
 
-      // Only add the assistant message when we have the complete response
       if (apiStore.currentResponse) {
         addMessage(
           conversation.id,
@@ -117,7 +111,6 @@ export const useChatStore = defineStore('chatStore', () => {
     try {
       const result = await apiStore.sendMessage(lastUserMessage.content, conversation.id)
 
-      // Only add the assistant message when we have the complete response
       if (apiStore.currentResponse) {
         addMessage(
           conversation.id,
