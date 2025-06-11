@@ -8,7 +8,10 @@
     "build": "tsc",
     "watch": "tsc -w"
   },
-  "dependencies": {},
+  "dependencies": {
+    "typeorm": "^0.3.24",
+    "reflect-metadata": "^0.1.13"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
   }
