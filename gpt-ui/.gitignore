@@ -34,3 +34,5 @@ out/
 
 test-results/
 playwright-report/
+
+.env
