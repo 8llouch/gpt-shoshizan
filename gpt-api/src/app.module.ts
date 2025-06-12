@@ -6,7 +6,7 @@ import {
   ConversationEntity,
   MessageEntity,
 } from '@shoshizan/shared-interfaces';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -14,22 +14,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      cache: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get('DB_USERNAME', 'postgres'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE', 'gpt_database'),
-        entities: [ConversationEntity, MessageEntity],
-        synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false), // false for production
-        logging: configService.get<boolean>('DB_LOGGING', false),
-      }),
-      inject: [ConfigService],
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      entities: [ConversationEntity, MessageEntity],
+      synchronize: process.env.DB_SYNCHRONIZE === 'true' || true, // false for production
     }),
     ConversationsModule,
   ],
