@@ -1,48 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useConversationsStore } from '../stores/conversationsStore'
+
+const conversationsStore = useConversationsStore()
 
 const { t } = useI18n()
 
-interface Conversation {
-  id: string
-  title: string
-  lastMessage: string
-  timestamp: Date
-}
-
 const isOpen = ref(false)
-const conversations = ref<Conversation[]>([
-  {
-    id: '1',
-    title: t('sidebar.newConversation'),
-    lastMessage: t('sidebar.help'),
-    timestamp: new Date(),
-  },
-])
+const conversations = computed(() =>
+  conversationsStore.conversations.map((conv) => ({
+    id: conv.id,
+    timestamp: conv.updatedAt,
+    createdAt: conv.createdAt,
+  })),
+)
 
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value
 }
 
 const startNewConversation = () => {
-  const newConv: Conversation = {
-    id: Date.now().toString(),
-    title: t('sidebar.newConversation'),
-    lastMessage: '',
-    timestamp: new Date(),
-  }
-  conversations.value.unshift(newConv)
+  conversationsStore.createConversation()
 }
 
-const formatDate = (date: Date) => {
+const selectConversation = (conversationId: string) => {
+  conversationsStore.selectConversation(conversationId)
+}
+
+const formatDate = (date: Date | string) => {
+  const dateObj = new Date(date)
   const now = new Date()
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = Math.floor((now.getTime() - dateObj.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays === 0) return t('sidebar.today')
   if (diffDays === 1) return t('sidebar.yesterday')
   if (diffDays < 7) return t('sidebar.daysAgo', { count: diffDays })
-  return date.toLocaleDateString('fr-FR')
+  return dateObj.toLocaleDateString('fr-FR')
+}
+
+const deleteConversation = async (conversationId: string, event: Event) => {
+  event.stopPropagation()
+  try {
+    await conversationsStore.deleteConversation(conversationId)
+  } catch (error) {
+    console.error('Failed to delete conversation:', error)
+  }
 }
 </script>
 
@@ -75,16 +78,18 @@ const formatDate = (date: Date) => {
           <div
             v-for="conversation in conversations"
             :key="conversation.id"
-            class="conversation-item"
+            :class="[
+              'conversation-item',
+              { active: conversation.id === conversationsStore.currentConversationId },
+            ]"
+            @click="selectConversation(conversation.id)"
           >
             <div class="conversation-content">
-              <h4 class="conversation-title">{{ conversation.title }}</h4>
-              <p class="conversation-preview">
-                {{ conversation.lastMessage || t('sidebar.emptyConversation') }}
-              </p>
-              <span class="conversation-date">{{ formatDate(conversation.timestamp) }}</span>
+              <span class="conversation-date">{{ formatDate(conversation.createdAt) }}</span>
             </div>
-            <button class="conversation-menu">⋮</button>
+            <button class="conversation-menu" @click="deleteConversation(conversation.id, $event)">
+              🗑️
+            </button>
           </div>
         </div>
       </div>
@@ -197,6 +202,19 @@ const formatDate = (date: Date) => {
   background: var(--hover-bg);
 }
 
+.conversation-item.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.conversation-item.active .conversation-date {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.conversation-item.active .conversation-menu {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .conversation-content {
   flex: 1;
   min-width: 0;
@@ -247,7 +265,9 @@ const formatDate = (date: Date) => {
 
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid var(--border-color);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 
 .user-section {

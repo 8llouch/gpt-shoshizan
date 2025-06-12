@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useChatStore } from '../stores/chatStore'
+import { useConversationsStore } from '../stores/conversationsStore'
 import { useApiStore } from '../stores/apiStore'
 
 const { t } = useI18n()
-const chatStore = useChatStore()
+const conversationsStore = useConversationsStore()
 const apiStore = useApiStore()
 
 const message = ref('')
@@ -34,7 +34,7 @@ const sendMessage = async () => {
   }
 
   try {
-    await chatStore.sendMessage(messageToSend)
+    await conversationsStore.sendMessage(messageToSend)
   } catch (error) {
     console.error(t('userInput.errorSend'), error)
   }
@@ -51,7 +51,7 @@ const regenerateResponse = async () => {
   if (!apiStore.canSendMessage) return
 
   try {
-    await chatStore.regenerateResponse()
+    await conversationsStore.regenerateResponse()
   } catch (error) {
     console.error(t('userInput.errorRegenerate'), error)
   }
