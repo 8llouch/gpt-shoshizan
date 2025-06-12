@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useChatStore } from './stores/chatStore'
+import { useConversationsStore } from './stores/conversationsStore'
 import { useApiStore } from './stores/apiStore'
 import GptLayout from './views/GptLayout.vue'
 import Sidebar from './views/Sidebar.vue'
@@ -10,19 +10,19 @@ import ThemeProvider from './components/base/ThemeProvider.vue'
 import ThemeSwitcher from './components/base/ThemeSwitcher.vue'
 import ModelSelector from './components/base/ModelSelector.vue'
 
-const chatStore = useChatStore()
+const conversationsStore = useConversationsStore()
 const apiStore = useApiStore()
 
 onMounted(() => {
-  chatStore.initializeStore()
+  conversationsStore.initialize()
 })
 
 const handleSendMessage = (message: string) => {
-  chatStore.sendMessage(message)
+  conversationsStore.sendMessage(message)
 }
 
 const handleRegenerateResponse = () => {
-  chatStore.regenerateResponse()
+  conversationsStore.regenerateResponse()
 }
 </script>
 
@@ -38,7 +38,7 @@ const handleRegenerateResponse = () => {
         </template>
         <template #conversation>
           <ConversationComponent
-            :messages="chatStore.currentMessages"
+            :messages="conversationsStore.currentMessages"
             :is-loading="apiStore.isLoading || apiStore.isStreaming"
           />
         </template>

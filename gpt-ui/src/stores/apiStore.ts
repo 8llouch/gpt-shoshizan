@@ -99,11 +99,6 @@ export const useApiStore = defineStore('apiStore', () => {
       if (stream.response) {
         if (stream.context) {
           setContext(stream.context)
-          console.log('New context received:', {
-            length: stream.context.length,
-            firstFewTokens: stream.context.slice(0, 5),
-            lastFewTokens: stream.context.slice(-5),
-          })
         }
       }
 
