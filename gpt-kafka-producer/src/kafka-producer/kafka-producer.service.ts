@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { KafkaConfigService } from '../kafka-config/kafka-config.service';
-import { Retry } from 'src/common/decorators/retry.decorator';
+import { Retry } from '../common/decorators/retry.decorator';
 import { LlmRequestMessage } from '@shoshizan/shared-interfaces';
 
 @Injectable()
