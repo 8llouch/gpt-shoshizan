@@ -26,6 +26,13 @@ export class ConversationsController {
   }
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
-    return await this.conversationsService.deleteConversation(id);
+    try {
+      return await this.conversationsService.deleteConversation(id);
+    } catch {
+      throw new HttpException(
+        'Failed to delete conversation',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
