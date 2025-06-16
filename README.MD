@@ -1,0 +1,177 @@
+# Shoshizan
+
+A distributed system for handling GPT (Generative Pre-trained Transformer) requests with a microservices architecture.
+
+## Project Overview
+
+Shoshizan is a microservices-based application that handles GPT requests through a distributed system. It consists of multiple services that work together to process, queue, and respond to GPT requests.
+
+## Architecture
+
+```
+┌─────────────┐     ┌───────────────┐     ┌───────────────┐
+│   GPT-UI    │────▶│ Kafka Producer│────▶│    Kafka     │
+└─────────────┘     └───────────────┘     └───────────────┘
+                                                    │
+                                                    ▼
+┌─────────────┐     ┌───────────────┐     ┌───────────────┐
+│  Response   │◀────│  GPT API      │◀────│Kafka Consumer│
+└─────────────┘     └───────────────┘     └───────────────┘
+```
+
+## Services
+
+### 1. GPT-UI (`gpt-ui/`)
+
+- Frontend application built with React
+- Provides user interface for GPT interactions
+- Handles conversation management and user input
+- Communicates with Kafka Producer for message sending
+
+### 2. Kafka Producer (`gpt-kafka-producer/`)
+
+- NestJS service for producing messages to Kafka
+- Implements retry mechanism for reliable message delivery
+- Handles message validation and formatting
+- Features:
+  - Configurable retry attempts
+  - Error handling
+  - Comprehensive logging
+
+### 3. Kafka Consumer (`gpt-kafka-consumer/`)
+
+- Consumes messages from Kafka topics
+- Processes GPT requests
+- Manages message flow and error handling
+- Features:
+  - Message validation
+  - Error recovery
+  - Dead letter queue handling
+
+### 4. GPT API (`gpt-api/`)
+
+- Core service for GPT model interaction
+- Handles model selection and configuration
+- Manages API rate limiting and quotas
+- Features:
+  - Multiple model support
+  - Response streaming
+  - Error handling
+
+### 5. Shared Interfaces (`shared-interfaces/`)
+
+- Common TypeScript interfaces and types
+- Shared between all services
+- Ensures type consistency across the system
+- Includes:
+  - Message types
+  - Configuration interfaces
+  - Common utilities
+
+## Prerequisites
+
+- Node.js (v16 or higher)
+- Kafka cluster
+- NestJS CLI
+- React development environment
+- Ollama server
+
+## Getting Started
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-org/shoshizan.git
+cd shoshizan
+```
+
+2. Install dependencies for each service:
+
+```bash
+# Install shared interfaces
+cd shared-interfaces
+npm install
+
+# Install and build each service
+cd ../gpt-ui
+npm install
+
+cd ../gpt-kafka-producer
+npm install
+
+cd ../gpt-kafka-consumer
+npm install
+
+cd ../gpt-api
+npm install
+```
+
+3. Configure environment variables for each service (see individual service READMEs)
+
+4. Start the services:
+
+```bash
+# Start Kafka
+
+# Start each service in development mode or debug
+cd gpt-ui
+npm run dev
+
+cd ../gpt-kafka-producer
+npm run start:dev
+
+cd ../gpt-kafka-consumer
+npm run start:dev
+
+cd ../gpt-api
+npm run start:dev
+```
+
+## Development
+
+### Testing
+
+Each service has its own test suite:
+
+```bash
+# Run tests for a specific service
+cd <service-directory>
+npm run test
+
+# Run e2e tests
+npm run test:e2e
+
+# Run test coverage
+npm run test:cov
+```
+
+### Building
+
+```bash
+# Build all services
+npm run build
+
+# Build individual service
+cd <service-directory>
+npm run build
+```
+
+## Deployment
+
+Each service can be deployed independently:
+
+1. Build the service
+2. Configure environment variables
+3. Deploy using your preferred method (Docker, Kubernetes, etc.)
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
