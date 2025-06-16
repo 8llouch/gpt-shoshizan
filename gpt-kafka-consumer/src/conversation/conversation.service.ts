@@ -18,19 +18,6 @@ export class ConversationService {
     private messageRepository: Repository<MessageEntity>,
   ) {}
 
-  /**
-   * Fetches all conversations from the database.
-   * @returns A promise that resolves to an array of Conversation entities.
-   */
-  async getConversations(): Promise<ConversationEntity[]> {
-    this.logger.log('Fetching all conversations');
-    const conversations = await this.conversationRepository.find({
-      relations: ['messages'],
-    });
-    this.logger.log(`Found ${conversations.length} conversations`);
-    return conversations;
-  }
-
   async createConversation(
     conversationId: string,
     systemPrompt?: string,
@@ -46,6 +33,9 @@ export class ConversationService {
       });
       const saved = await this.conversationRepository.save(conversation);
       this.logger.log(`Created conversation ${conversationId}`);
+      if (!saved) {
+        throw new Error('Conversation not created');
+      }
       return saved;
     } catch (error) {
       const errorMessage =
@@ -94,28 +84,6 @@ export class ConversationService {
     const saved = await this.messageRepository.save(message);
     this.logger.log(`Added message to conversation ${conversationId}`);
     return saved;
-  }
-
-  async updateApiMetrics(
-    conversationId: string,
-    metrics: {
-      total_duration?: number;
-      load_duration?: number;
-      prompt_eval_duration?: number;
-      eval_duration?: number;
-      eval_count?: number;
-    },
-  ): Promise<ConversationEntity> {
-    const conversation = await this.conversationRepository.findOne({
-      where: { id: conversationId },
-    });
-
-    if (!conversation) {
-      throw new Error(`Conversation ${conversationId} not found`);
-    }
-
-    conversation.apiMetrics = metrics;
-    return this.conversationRepository.save(conversation);
   }
 
   async getConversation(
