@@ -9,7 +9,7 @@
     "online": "Online",
     "today": "Today",
     "yesterday": "Yesterday",
-    "daysAgo": "{{count}} days ago",
+    "daysAgo": "{count} days ago",
     "help": "How can I help you?"
   },
   "userInput": {

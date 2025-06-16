@@ -9,7 +9,7 @@
     "online": "En ligne",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
-    "daysAgo": "Il y a {{count}} jours",
+    "daysAgo": "Il y a {count} jours",
     "help": "Comment puis-je vous aider ?"
   },
   "userInput": {
