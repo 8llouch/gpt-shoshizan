@@ -23,7 +23,7 @@ Shoshizan is a microservices-based application that handles GPT requests through
 
 ### 1. GPT-UI (`gpt-ui/`)
 
-- Frontend application built with React
+- Frontend application built with Vue
 - Provides user interface for GPT interactions
 - Handles conversation management and user input
 - Communicates with Kafka Producer for message sending
