@@ -5,10 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ConversationEntity,
   MessageEntity,
+  UserEntity,
 } from '@shoshizan/shared-interfaces';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ConversationEntity, MessageEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ConversationEntity, MessageEntity, UserEntity]),
+  ],
   controllers: [ConversationsController],
   providers: [ConversationsService],
   exports: [ConversationsService],

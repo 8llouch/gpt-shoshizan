@@ -32,9 +32,21 @@ describe('ConversationsController', () => {
 
   describe('findAll', () => {
     it('should return all conversations with messages', async () => {
+      const userId = 'user-123';
+      const mockReq = {
+        user: {
+          sub: userId,
+          email: 'test@example.com',
+          role: 'user',
+          iat: 1234567890,
+          exp: 1234567890,
+        },
+      };
+
       const conversations = [
         {
           id: '1',
+          userId,
           messages: [
             { id: '1', content: 'Hello you !' },
             { id: '2', content: 'How do you do ?' },
@@ -44,15 +56,26 @@ describe('ConversationsController', () => {
       service.getConversationsWithMessages.mockResolvedValue(
         conversations as ConversationEntity[],
       );
-      const result = await controller.findAll();
+      const result = await controller.findAll(mockReq);
       expect(result).toEqual(conversations);
-      expect(service.getConversationsWithMessages).toHaveBeenCalled();
+      expect(service.getConversationsWithMessages).toHaveBeenCalledWith(userId);
     });
     it('should handle errors when fetching conversations', async () => {
+      const userId = 'user-123';
+      const mockReq = {
+        user: {
+          sub: userId,
+          email: 'test@example.com',
+          role: 'user',
+          iat: 1234567890,
+          exp: 1234567890,
+        },
+      };
+
       service.getConversationsWithMessages.mockRejectedValue(
         new Error('Test error'),
       );
-      await expect(controller.findAll()).rejects.toThrow(
+      await expect(controller.findAll(mockReq)).rejects.toThrow(
         'Failed to fetch conversations',
       );
     });
