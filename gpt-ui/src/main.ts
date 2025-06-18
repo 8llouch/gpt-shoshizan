@@ -8,11 +8,10 @@ import router from './router'
 import { i18n } from './i18n'
 import { useConversationsStore } from './stores/conversationsStore'
 
-const app = createApp(App)
+const app = createApp(App).use(router)
 
 app.use(createPinia())
 app.use(i18n)
-app.use(router)
 
 const conversationsStore = useConversationsStore()
 conversationsStore.initialize()
