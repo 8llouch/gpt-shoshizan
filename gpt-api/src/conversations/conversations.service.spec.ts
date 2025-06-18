@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   ConversationEntity,
   MessageEntity,
+  UserEntity,
 } from '@shoshizan/shared-interfaces';
 import { Repository } from 'typeorm';
 
@@ -11,6 +12,7 @@ describe('ConversationsService', () => {
   let service: ConversationsService;
   let conversationRepository: jest.Mocked<Repository<ConversationEntity>>;
   let messageRepository: jest.Mocked<Repository<MessageEntity>>;
+  let userRepository: jest.Mocked<Repository<UserEntity>>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +31,19 @@ describe('ConversationsService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: getRepositoryToken(UserEntity),
+          useValue: {
+            findOne: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<ConversationsService>(ConversationsService);
     conversationRepository = module.get(getRepositoryToken(ConversationEntity));
     messageRepository = module.get(getRepositoryToken(MessageEntity));
+    userRepository = module.get(getRepositoryToken(UserEntity));
   });
 
   it('should be defined', () => {
@@ -42,21 +51,56 @@ describe('ConversationsService', () => {
   });
 
   describe('getConversationsWithMessages', () => {
-    it('should return all conversations with messages', async () => {
+    it('should return conversations with messages for a specific user', async () => {
+      const userId = 'user-123';
+      const mockUser = {
+        id: userId,
+        email: 'test@example.com',
+        name: 'Test User',
+        password: 'password',
+        role: 'user',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       const conversations = [
-        { id: '1', messages: [{ id: '1', content: 'Hello you !' }] },
-        { id: '2', messages: [{ id: '2', content: 'How do you do ?' }] },
+        { id: '1', userId, messages: [{ id: '1', content: 'Hello you !' }] },
+        {
+          id: '2',
+          userId,
+          messages: [{ id: '2', content: 'How do you do ?' }],
+        },
       ];
+
+      userRepository.findOne.mockResolvedValue(mockUser as UserEntity);
       conversationRepository.find.mockResolvedValue(
         conversations as ConversationEntity[],
       );
 
-      const result = await service.getConversationsWithMessages();
+      const result = await service.getConversationsWithMessages(userId);
 
       expect(result).toEqual(conversations);
-      expect(conversationRepository.find).toHaveBeenCalledWith({
-        relations: ['messages'],
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: userId },
       });
+      expect(conversationRepository.find).toHaveBeenCalledWith({
+        where: { userId },
+        relations: ['messages', 'user'],
+        order: { createdAt: 'DESC' },
+      });
+    });
+
+    it('should return empty array when user not found', async () => {
+      const userId = 'non-existent-user';
+
+      userRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.getConversationsWithMessages(userId);
+
+      expect(result).toEqual([]);
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: userId },
+      });
+      expect(conversationRepository.find).not.toHaveBeenCalled();
     });
   });
 
