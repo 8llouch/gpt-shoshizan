@@ -73,7 +73,7 @@ Shoshizan is a microservices-based application that handles GPT requests through
 - Node.js (v16 or higher)
 - Kafka cluster
 - NestJS CLI
-- React development environment
+- Vue.js development environment
 - Ollama server
 
 ## Getting Started
