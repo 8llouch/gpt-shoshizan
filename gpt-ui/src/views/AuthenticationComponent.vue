@@ -91,6 +91,7 @@ const toggleMode = () => {
             type="email"
             required
             placeholder="Enter your email"
+            autocomplete="username"
           />
         </div>
 
@@ -102,6 +103,7 @@ const toggleMode = () => {
             type="password"
             required
             placeholder="Enter your password"
+            autocomplete="current-password"
           />
         </div>
 
