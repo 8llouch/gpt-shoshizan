@@ -1,4 +1,5 @@
 import type { ApiRequest, ApiResponse } from '@shoshizan/shared-interfaces'
+import { useAuthStore } from '../stores/authStore'
 
 export class ApiService {
   private static readonly LLM_API_URL = 'http://localhost:11434/api/generate'
@@ -71,11 +72,19 @@ export class ApiService {
               context: contextLlm,
             }
             try {
+              const authStore = useAuthStore()
+              const authHeaders = authStore.getAuthHeaders()
+              const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+              }
+
+              if (authHeaders.Authorization) {
+                headers.Authorization = authHeaders.Authorization
+              }
+
               await fetch(ApiService.KAFKA_PRODUCER_URL_INPUTS, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
+                headers,
                 body: JSON.stringify(request),
               })
               const responseMessage = {
@@ -88,9 +97,7 @@ export class ApiService {
               }
               await fetch(ApiService.KAFKA_PRODUCER_URL_RESPONSE, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
+                headers,
                 body: JSON.stringify(responseMessage),
               })
             } catch (err) {
