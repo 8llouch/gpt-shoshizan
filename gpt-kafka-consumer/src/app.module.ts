@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ConversationEntity,
   MessageEntity,
+  UserEntity,
 } from '@shoshizan/shared-interfaces';
 import { KafkaController } from './kafka.controller';
 
@@ -24,7 +25,7 @@ import { KafkaController } from './kafka.controller';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [ConversationEntity, MessageEntity],
+      entities: [ConversationEntity, MessageEntity, UserEntity],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' || true, // only for dev purposes
     }),
     ConversationModule,
