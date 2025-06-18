@@ -1,5 +1,6 @@
 export { ConversationEntity } from "./conversation.entity";
 export { MessageEntity } from "./message.entity";
+export { UserEntity } from "./user.entity";
 
 export interface Message {
   id: string;
@@ -38,6 +39,7 @@ export interface ModelOptions {
 }
 
 export interface LlmRequestMessage {
+  userId?: string;
   conversationId: string;
   model: string;
   prompt: string;
@@ -87,4 +89,12 @@ export interface KafkaConfig {
   clientId: string;
   brokers: string[];
   groupId?: string;
+}
+
+export interface JwtPayload {
+  sub: string; // User ID
+  email: string; // User email
+  role?: string; // Optional user role
+  iat?: number; // Issued at timestamp
+  exp?: number; // Expiration timestamp
 }
