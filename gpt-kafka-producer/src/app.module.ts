@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,9 +12,13 @@ import { KafkaProducerModule } from './kafka-producer/kafka-producer.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '1d' },
+      }),
+      inject: [ConfigService],
     }),
     KafkaConfigModule,
     KafkaProducerModule,
