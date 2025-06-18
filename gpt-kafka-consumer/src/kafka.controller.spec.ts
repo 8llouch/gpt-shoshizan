@@ -46,6 +46,16 @@ describe('KafkaController', () => {
 
       const mockConversation: ConversationEntity = {
         id: '1',
+        userId: '1',
+        user: {
+          id: '1',
+          email: 'test@test.com',
+          name: 'Test User',
+          password: '123456',
+          role: 'user',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
         systemPrompt: mockData.system!,
         modelOptions: mockData.options,
         messages: [],
@@ -82,6 +92,7 @@ describe('KafkaController', () => {
         mockData.conversationId,
         mockData.system,
         mockData.options,
+        mockData.userId,
       );
       expect(conversationService.addMessage).toHaveBeenCalledWith(
         mockData.conversationId,
@@ -121,6 +132,16 @@ describe('KafkaController', () => {
 
       const mockConversation: ConversationEntity = {
         id: '1',
+        userId: '1',
+        user: {
+          id: '1',
+          email: 'test@test.com',
+          name: 'Test User',
+          password: '123456',
+          role: 'user',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
         systemPrompt: '',
         modelOptions: { temperature: 0.7, num_predict: 100 },
         messages: [],
