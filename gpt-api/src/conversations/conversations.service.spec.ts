@@ -22,6 +22,7 @@ describe('ConversationsService', () => {
           provide: getRepositoryToken(ConversationEntity),
           useValue: {
             find: jest.fn(),
+            findOne: jest.fn(),
             delete: jest.fn(),
           },
         },
@@ -41,9 +42,15 @@ describe('ConversationsService', () => {
     }).compile();
 
     service = module.get<ConversationsService>(ConversationsService);
-    conversationRepository = module.get(getRepositoryToken(ConversationEntity));
-    messageRepository = module.get(getRepositoryToken(MessageEntity));
-    userRepository = module.get(getRepositoryToken(UserEntity));
+    conversationRepository = module.get<
+      jest.Mocked<Repository<ConversationEntity>>
+    >(getRepositoryToken(ConversationEntity));
+    messageRepository = module.get<jest.Mocked<Repository<MessageEntity>>>(
+      getRepositoryToken(MessageEntity),
+    );
+    userRepository = module.get<jest.Mocked<Repository<UserEntity>>>(
+      getRepositoryToken(UserEntity),
+    );
   });
 
   it('should be defined', () => {
