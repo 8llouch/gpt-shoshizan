@@ -5,9 +5,11 @@ import { ConversationsModule } from './conversations/conversations.module';
 import {
   ConversationEntity,
   MessageEntity,
+  UserEntity,
 } from '@shoshizan/shared-interfaces';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './authentication/authentication.module';
 
 @Module({
   imports: [
@@ -22,10 +24,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [ConversationEntity, MessageEntity],
+      entities: [ConversationEntity, MessageEntity, UserEntity],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' || true, // false for production
     }),
     ConversationsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
