@@ -84,12 +84,35 @@ describe('ConversationsController', () => {
   describe('deleteConversation', () => {
     it('should delete a conversation', async () => {
       const conversationId = '1';
-      await controller.delete(conversationId);
-      expect(service.deleteConversation).toHaveBeenCalledWith(conversationId);
+      const userId = 'user-123';
+      const mockReq = {
+        user: {
+          sub: userId,
+          email: 'test@example.com',
+          role: 'user',
+          iat: 1234567890,
+          exp: 1234567890,
+        },
+      };
+      await controller.delete(conversationId, mockReq);
+      expect(service.deleteConversation).toHaveBeenCalledWith(
+        conversationId,
+        userId,
+      );
     });
     it('should handle errors when deleting a conversation', async () => {
+      const userId = 'user-123';
+      const mockReq = {
+        user: {
+          sub: userId,
+          email: 'test@example.com',
+          role: 'user',
+          iat: 1234567890,
+          exp: 1234567890,
+        },
+      };
       service.deleteConversation.mockRejectedValue(new Error('Test error'));
-      await expect(controller.delete('1')).rejects.toThrow(
+      await expect(controller.delete('1', mockReq)).rejects.toThrow(
         'Failed to delete conversation',
       );
     });

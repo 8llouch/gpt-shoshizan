@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ConversationEntity, JwtPayload } from '@shoshizan/shared-interfaces';
-import { JwtAuthGuard } from 'src/authentication/guards/jwt-authentication.guard';
+import { JwtAuthGuard } from '../authentication/guards/jwt-authentication.guard';
 
 @Controller('conversations')
 export class ConversationsController {

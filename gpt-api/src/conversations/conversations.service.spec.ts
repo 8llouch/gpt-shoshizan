@@ -107,13 +107,37 @@ describe('ConversationsService', () => {
   describe('deleteConversation', () => {
     it('should delete a conversation', async () => {
       const conversationId = '1';
-      await service.deleteConversation(conversationId);
-      expect(conversationRepository.delete).toHaveBeenCalledWith(
-        conversationId,
+      const userId = 'user-123';
+      const mockConversation = {
+        id: conversationId,
+        userId: userId,
+        messages: [],
+        user: null,
+        systemPrompt: null,
+        responses: [],
+        modelOptions: null,
+        apiMetrics: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      conversationRepository.findOne.mockResolvedValue(
+        mockConversation as unknown as ConversationEntity,
       );
+      messageRepository.delete.mockResolvedValue({ affected: 1 } as any);
+      conversationRepository.delete.mockResolvedValue({ affected: 1 } as any);
+
+      await service.deleteConversation(conversationId, userId);
+
+      expect(conversationRepository.findOne).toHaveBeenCalledWith({
+        where: { id: conversationId },
+      });
       expect(messageRepository.delete).toHaveBeenCalledWith({
         conversation: { id: conversationId },
       });
+      expect(conversationRepository.delete).toHaveBeenCalledWith(
+        conversationId,
+      );
     });
   });
 });
