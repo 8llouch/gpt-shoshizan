@@ -1,11 +1,19 @@
-import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { MessageEntity } from "./message.entity";
+import { UserEntity } from "./user.entity";
 import { ModelOptions } from ".";
 
 @Entity()
 export class ConversationEntity {
   @PrimaryColumn()
   id: string;
+
+  @Column({ nullable: true })
+  userId: string;
+
+  @ManyToOne(() => UserEntity, { nullable: true })
+  @JoinColumn({ name: "userId" })
+  user: UserEntity;
 
   @Column({ type: "jsonb", nullable: true })
   systemPrompt: string;

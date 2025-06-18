@@ -19,6 +19,7 @@ export class KafkaController {
         data.conversationId,
         data.system,
         data.options,
+        data.userId,
       );
 
       this.logger.log('conversation created: ', conversation);
