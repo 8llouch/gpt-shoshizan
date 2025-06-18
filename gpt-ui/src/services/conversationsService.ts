@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore'
 import type { ConversationEntity } from '@shoshizan/shared-interfaces'
 
 export class ConversationsService {
@@ -5,11 +6,18 @@ export class ConversationsService {
 
   static async getConversations(): Promise<ConversationEntity[]> {
     try {
+      const authStore = useAuthStore()
+      const authHeaders = authStore.getAuthHeaders()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+
+      if (authHeaders.Authorization) {
+        headers.Authorization = authHeaders.Authorization
+      }
       const response = await fetch(`${ConversationsService.API_BASE_URL}/conversations`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       })
 
       if (!response.ok) {
@@ -26,11 +34,17 @@ export class ConversationsService {
 
   static async deleteConversation(id: string): Promise<void> {
     try {
+      const authStore = useAuthStore()
+      const authHeaders = authStore.getAuthHeaders()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (authHeaders.Authorization) {
+        headers.Authorization = authHeaders.Authorization
+      }
       const response = await fetch(`${ConversationsService.API_BASE_URL}/conversations/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       })
 
       if (!response.ok) {
