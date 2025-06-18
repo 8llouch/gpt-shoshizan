@@ -16,10 +16,15 @@ export const useModelStore = defineStore('modelStore', () => {
     selectedModel.value = model
   }
 
+  const reset = () => {
+    selectedModel.value = 'llama3.2'
+  }
+
   return {
     selectedModel,
     getSelectedModel,
     selectedModelName,
     setSelectedModel,
+    reset,
   }
 })

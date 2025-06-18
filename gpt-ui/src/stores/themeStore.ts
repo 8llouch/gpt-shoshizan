@@ -58,11 +58,18 @@ export const useThemeStore = defineStore('themeStore', () => {
     }
   }
 
+  const reset = () => {
+    currentTheme.value = 'light'
+    localStorage.removeItem('theme')
+    applyTheme('light')
+  }
+
   return {
     currentTheme,
     getCurrentTheme,
     setTheme,
     toggleTheme,
     initTheme,
+    reset,
   }
 })

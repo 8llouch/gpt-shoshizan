@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { ConversationsService } from '../services/conversationsService'
 import { useApiStore } from './apiStore'
 import { useModelStore } from './modelStore'
+import { useAuthStore } from './authStore'
 import type {
   ConversationEntity,
   MessageEntity,
@@ -82,6 +83,8 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
   const createConversation = (): ConversationEntity => {
     const newConversation: ConversationEntity = {
       id: Date.now().toString(),
+      userId: undefined as any,
+      user: undefined as any,
       createdAt: new Date(),
       updatedAt: new Date(),
       systemPrompt: '',
@@ -247,6 +250,12 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
   }
 
   const initialize = async (): Promise<void> => {
+    const authStore = useAuthStore()
+
+    if (!authStore.isAuthenticated) {
+      return
+    }
+
     if (conversations.value.length === 0) {
       await loadConversations()
     }

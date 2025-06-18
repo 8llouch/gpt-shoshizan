@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { AuthenticationService } from '../services/authenticationService'
+import { useConversationsStore } from './conversationsStore'
+import { useApiStore } from './apiStore'
+import { useModelStore } from './modelStore'
+import { useThemeStore } from './themeStore'
+import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('authToken'))
@@ -34,6 +39,21 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     localStorage.removeItem('authToken')
+    cleanAllStores()
+  }
+
+  const cleanAllStores = () => {
+    const conversationsStore = useConversationsStore()
+    conversationsStore.reset()
+
+    const apiStore = useApiStore()
+    apiStore.reset()
+
+    const modelStore = useModelStore()
+    modelStore.reset()
+
+    const themeStore = useThemeStore()
+    themeStore.reset()
   }
 
   const getAuthHeaders = () => {
@@ -52,5 +72,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     getAuthHeaders,
+    cleanAllStores,
   }
 })
