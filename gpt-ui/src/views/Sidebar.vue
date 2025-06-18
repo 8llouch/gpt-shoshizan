@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useConversationsStore } from '../stores/conversationsStore'
+import { useAuthStore } from '../stores/authStore'
 
 const conversationsStore = useConversationsStore()
+const authStore = useAuthStore()
+const router = useRouter()
 
 const { t } = useI18n()
 
@@ -46,6 +50,11 @@ const deleteConversation = async (conversationId: string, event: Event) => {
   } catch (error) {
     console.error('Failed to delete conversation:', error)
   }
+}
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/auth')
 }
 </script>
 
@@ -101,6 +110,24 @@ const deleteConversation = async (conversationId: string, event: Event) => {
             <span class="user-name">{{ t('sidebar.user') }}</span>
             <span class="user-status">{{ t('sidebar.online') }}</span>
           </div>
+          <button @click="handleLogout" class="logout-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-log-out"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+          </button>
         </div>
       </footer>
     </aside>
@@ -273,7 +300,9 @@ const deleteConversation = async (conversationId: string, event: Event) => {
 .user-section {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .user-avatar {
@@ -285,23 +314,56 @@ const deleteConversation = async (conversationId: string, event: Event) => {
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  flex-shrink: 0;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .user-name {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-status {
   font-size: 12px;
   color: var(--success-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+  font-size: 16px;
+  flex-shrink: 0;
+  min-width: 32px;
+}
+
+.logout-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  opacity: 1;
 }
 
 .conversations-section::-webkit-scrollbar {

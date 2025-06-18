@@ -15,12 +15,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@shoshizan/shared-interfaces": "file:../shared-interfaces",
+    "marked": "^15.0.12",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.5",
-    "vue-router": "^4.5.0",
-    "marked": "^15.0.12",
-    "@shoshizan/shared-interfaces": "file:../shared-interfaces"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
