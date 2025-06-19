@@ -40,14 +40,16 @@
 
 /* Application des styles avec transition */
 * {
-  transition: background-color var(--transition-duration) ease,
-              color var(--transition-duration) ease,
-              border-color var(--transition-duration) ease;
+  transition:
+    background-color var(--transition-duration) ease,
+    color var(--transition-duration) ease,
+    border-color var(--transition-duration) ease;
 }
 
 body {
-  transition: background-color var(--transition-duration) ease,
-              color var(--transition-duration) ease;
+  transition:
+    background-color var(--transition-duration) ease,
+    color var(--transition-duration) ease;
 }
 
 #app {

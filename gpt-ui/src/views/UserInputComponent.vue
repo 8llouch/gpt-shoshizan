@@ -94,7 +94,9 @@ const regenerateResponse = async () => {
         <div v-if="apiStore.error" class="error-message">
           {{ apiStore.error }}
         </div>
-        <div v-if="apiStore.isStreaming" class="streaming-indicator">{{ t('userInput.sending') }}</div>
+        <div v-if="apiStore.isStreaming" class="streaming-indicator">
+          {{ t('userInput.sending') }}
+        </div>
       </div>
     </div>
   </div>

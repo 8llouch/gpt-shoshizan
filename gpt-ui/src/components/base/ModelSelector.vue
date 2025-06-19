@@ -27,11 +27,7 @@ const handleModelChange = (event: Event) => {
       @change="handleModelChange"
       class="model-select"
     >
-      <option
-        v-for="option in MODEL_OPTIONS"
-        :key="option.value"
-        :value="option.value"
-      >
+      <option v-for="option in MODEL_OPTIONS" :key="option.value" :value="option.value">
         {{ option.text }}
       </option>
     </select>

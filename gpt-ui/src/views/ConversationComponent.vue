@@ -31,15 +31,18 @@ const displayMessages = computed(() => {
 const formatTime = (timestamp: number) => {
   return new Date(timestamp).toLocaleTimeString('fr-FR', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
-watch(() => apiStore.currentResponse, () => {
-  nextTick(() => {
-    scrollToBottom()
-  })
-})
+watch(
+  () => apiStore.currentResponse,
+  () => {
+    nextTick(() => {
+      scrollToBottom()
+    })
+  },
+)
 
 onMounted(() => {
   scrollToBottom()
@@ -49,8 +52,11 @@ onMounted(() => {
 <template>
   <div class="conversation-container">
     <div ref="conversationContainer" class="messages-container">
-      <div v-for="message in displayMessages" :key="message.id"
-           :class="`message-wrapper ${message.role}-message`">
+      <div
+        v-for="message in displayMessages"
+        :key="message.id"
+        :class="`message-wrapper ${message.role}-message`"
+      >
         <div class="message-container">
           <div v-if="message.role === 'assistant'" class="avatar">
             <span>{{ message.modelName || t('conversation.assistant') }}</span>
@@ -69,7 +75,10 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-if="props.isLoading && !apiStore.isStreaming" class="message-wrapper assistant-message">
+      <div
+        v-if="props.isLoading && !apiStore.isStreaming"
+        class="message-wrapper assistant-message"
+      >
         <div class="message-container">
           <div class="avatar">
             <span>{{ modelStore.selectedModelName }}</span>
@@ -92,7 +101,10 @@ onMounted(() => {
             <span>{{ modelStore.selectedModelName }}</span>
           </div>
           <div class="message-content">
-            <div class="message-text streaming-text" v-html="marked(apiStore.currentResponse )"></div>
+            <div
+              class="message-text streaming-text"
+              v-html="marked(apiStore.currentResponse)"
+            ></div>
             <div class="message-meta">
               <span class="streaming-indicator">{{ t('conversation.streaming') }}</span>
             </div>
@@ -201,8 +213,14 @@ onMounted(() => {
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .message-meta {
@@ -246,7 +264,9 @@ onMounted(() => {
 }
 
 @keyframes typing {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
