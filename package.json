@@ -1,0 +1,55 @@
+{
+  "name": "gpt-shoshizan",
+  "version": "0.1.0",
+  "description": "GPT-SHOSHIZAN - Complete AI Chat Application with Microservices Architecture",
+  "private": true,
+  "workspaces": [
+    "gpt-api",
+    "gpt-kafka-consumer",
+    "gpt-kafka-producer",
+    "gpt-ui",
+    "shared-interfaces"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others --names \"API,CONSUMER,PRODUCER,UI\" --prefix-colors \"blue,green,yellow,magenta\" \"npm run dev:api\" \"npm run dev:consumer\" \"npm run dev:producer\" \"npm run dev:ui\"",
+    "debug": "concurrently --kill-others --names \"API,CONSUMER,PRODUCER,UI\" --prefix-colors \"blue,green,yellow,magenta\" \"npm run debug:api\" \"npm run debug:consumer\" \"npm run debug:producer\" \"npm run dev:ui\"",
+    "debug:api": "npm run start:debug --workspace=gpt-api",
+    "debug:consumer": "npm run start:debug --workspace=gpt-kafka-consumer",
+    "debug:producer": "npm run start:debug --workspace=gpt-kafka-producer",
+    "start": "npm run dev",
+    "test:all": "npm run test --workspace=gpt-api && npm run test --workspace=gpt-kafka-consumer && npm run test --workspace=gpt-kafka-producer",
+    "test:api": "npm run test --workspace=gpt-api",
+    "test:consumer": "npm run test --workspace=gpt-kafka-consumer",
+    "test:producer": "npm run test --workspace=gpt-kafka-producer",
+    "test:ui": "npm run test:unit --workspace=gpt-ui",
+    "lint:all": "npm run lint --workspace=gpt-api && npm run lint --workspace=gpt-kafka-consumer && npm run lint --workspace=gpt-kafka-producer && npm run lint --workspace=gpt-ui",
+    "lint:api": "npm run lint --workspace=gpt-api",
+    "lint:consumer": "npm run lint --workspace=gpt-kafka-consumer",
+    "lint:producer": "npm run lint --workspace=gpt-kafka-producer",
+    "lint:ui": "npm run lint --workspace=gpt-ui",
+    "format:all": "npm run format --workspace=gpt-api && npm run format --workspace=gpt-kafka-consumer && npm run format --workspace=gpt-kafka-producer && npm run format --workspace=gpt-ui",
+    "format:api": "npm run format --workspace=gpt-api",
+    "format:consumer": "npm run format --workspace=gpt-kafka-consumer",
+    "format:producer": "npm run format --workspace=gpt-kafka-producer",
+    "format:ui": "npm run format --workspace=gpt-ui"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "gpt",
+    "chat",
+    "ai",
+    "microservices",
+    "nestjs",
+    "vue",
+    "kafka",
+    "typescript"
+  ],
+  "author": "8llouch - shoshizan",
+  "license": "UNLICENSED"
+}
