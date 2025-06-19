@@ -11,11 +11,17 @@ import {
 import { ConversationsService } from './conversations.service';
 import { ConversationEntity, JwtPayload } from '@shoshizan/shared-interfaces';
 import { JwtAuthGuard } from '../authentication/guards/jwt-authentication.guard';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('conversations')
 export class ConversationsController {
   constructor(private readonly conversationsService: ConversationsService) {}
 
+  @ApiOperation({ summary: 'Get all conversations for the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a list of conversations with messages',
+  })
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(
@@ -33,6 +39,11 @@ export class ConversationsController {
     }
   }
 
+  @ApiOperation({ summary: 'Delete a conversation by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation deleted successfully',
+  })
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(
