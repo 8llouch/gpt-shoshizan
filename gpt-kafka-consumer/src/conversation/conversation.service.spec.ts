@@ -108,7 +108,7 @@ describe('ConversationsService', () => {
     it('should create conversation without user association when user not found', async () => {
       const conversationId = '1';
       const userId = 'non-existent-user';
-      const mockConversation = { id: conversationId, userId };
+      const mockConversation = { id: conversationId };
 
       userRepository.findOne.mockResolvedValue(null);
       conversationRepository.create.mockReturnValue(
@@ -130,7 +130,7 @@ describe('ConversationsService', () => {
       });
       expect(conversationRepository.create).toHaveBeenCalledWith({
         id: conversationId,
-        userId,
+        userId: undefined,
         systemPrompt: undefined,
         modelOptions: undefined,
         responses: [],
@@ -175,6 +175,7 @@ describe('ConversationsService', () => {
       expect(messageRepository.create).toHaveBeenCalled();
       expect(messageRepository.save).toHaveBeenCalled();
     });
+
     it('should throw an error if the conversation is not found', async () => {
       const conversationId = '1';
       conversationRepository.findOne.mockResolvedValue(null);

@@ -112,11 +112,11 @@ describe('KafkaController', () => {
       };
 
       conversationService.createConversation.mockRejectedValue(
-        new Error('Test error'),
+        new Error('[TEST SCENARIO] Expected error in input message processing'),
       );
 
       await expect(controller.handleInputCreated(mockData)).rejects.toThrow(
-        'Test error',
+        '[TEST SCENARIO] Expected error in input message processing',
       );
     });
   });
