@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev": "concurrently --kill-others --names \"API,CONSUMER,PRODUCER,UI\" --prefix-colors \"blue,green,yellow,magenta\" \"npm run dev:api\" \"npm run dev:consumer\" \"npm run dev:producer\" \"npm run dev:ui\"",
+    "dev:ui": "npm run dev --workspace=gpt-ui",
     "debug": "concurrently --kill-others --names \"API,CONSUMER,PRODUCER,UI\" --prefix-colors \"blue,green,yellow,magenta\" \"npm run debug:api\" \"npm run debug:consumer\" \"npm run debug:producer\" \"npm run dev:ui\"",
     "debug:api": "npm run start:debug --workspace=gpt-api",
     "debug:consumer": "npm run start:debug --workspace=gpt-kafka-consumer",
