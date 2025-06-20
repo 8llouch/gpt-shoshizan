@@ -15,14 +15,27 @@ export class KafkaController {
   @MessagePattern('input.created')
   async handleInputCreated(@Payload() data: LlmRequestMessage) {
     try {
-      const conversation = await this.conversationService.createConversation(
+      let conversation = await this.conversationService.getConversation(
         data.conversationId,
-        data.system,
-        data.options,
-        data.userId,
       );
 
-      this.logger.log('conversation created: ', conversation);
+      if (!conversation) {
+        this.logger.log(
+          `Creating new conversation ${data.conversationId} for first message`,
+        );
+        conversation = await this.conversationService.createConversation(
+          data.conversationId,
+          data.system,
+          data.options,
+          data.userId,
+        );
+        this.logger.log('Conversation created: ', conversation.id);
+      } else {
+        this.logger.log(
+          'Processing message for existing conversation: ',
+          conversation.id,
+        );
+      }
 
       const message = await this.conversationService.addMessage(
         data.conversationId,
