@@ -47,6 +47,7 @@ describe('KafkaProducerService', () => {
       expect(mockKafkaConfigService.sendMessage).toHaveBeenCalledWith(
         topic,
         message,
+        message.conversationId,
         KafkaProducerService.name,
       );
     });
@@ -76,6 +77,7 @@ describe('KafkaProducerService', () => {
       expect(mockKafkaConfigService.sendMessage).toHaveBeenLastCalledWith(
         topic,
         message,
+        message.conversationId,
         KafkaProducerService.name,
       );
     });
