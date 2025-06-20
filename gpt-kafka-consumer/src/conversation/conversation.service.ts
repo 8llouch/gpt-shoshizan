@@ -50,6 +50,7 @@ export class ConversationService {
         systemPrompt,
         modelOptions,
         responses: [],
+        context: null,
       });
       const saved = await this.conversationRepository.save(conversation);
       this.logger.log(`Created conversation ${conversationId}`);
@@ -104,6 +105,28 @@ export class ConversationService {
     const saved = await this.messageRepository.save(message);
     this.logger.log(`Added message to conversation ${conversationId}`);
     return saved;
+  }
+
+  async updateConversationContext(
+    conversationId: string,
+    context: number[],
+  ): Promise<void> {
+    this.logger.log(`Updating context for conversation ${conversationId}`);
+
+    const conversation = await this.conversationRepository.findOne({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      this.logger.error(`Conversation ${conversationId} not found`);
+      throw new Error(`Conversation ${conversationId} not found`);
+    }
+
+    conversation.context = context;
+    conversation.updatedAt = new Date();
+
+    await this.conversationRepository.save(conversation);
+    this.logger.log(`Updated context for conversation ${conversationId}`);
   }
 
   async getConversation(
