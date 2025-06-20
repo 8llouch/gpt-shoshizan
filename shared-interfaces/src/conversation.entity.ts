@@ -43,6 +43,9 @@ export class ConversationEntity {
     eval_count?: number;
   };
 
+  @Column({ type: "jsonb", nullable: true })
+  context: number[] | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
