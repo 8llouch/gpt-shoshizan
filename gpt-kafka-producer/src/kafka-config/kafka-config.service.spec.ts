@@ -42,6 +42,7 @@ describe('KafkaConfigService', () => {
   describe('onModuleInit', () => {
     it('should connect to Kafka successfully', async () => {
       await service.onModuleInit();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockProducer.connect).toHaveBeenCalled();
     });
 
@@ -57,28 +58,34 @@ describe('KafkaConfigService', () => {
     const testTopic = 'test-topic';
     const testMessage = { key: 'value' };
     const testContext = 'test-context';
+    const testKey = 'test-key';
 
     it('should send message successfully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result = await service.sendMessage(
         testTopic,
         testMessage,
+        testKey,
         testContext,
       );
 
       const expectedMessage: ProducerRecord = {
         topic: testTopic,
-        messages: [{ value: JSON.stringify(testMessage) }],
+        messages: [{ key: testKey, value: JSON.stringify(testMessage) }],
       };
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockProducer.send).toHaveBeenCalledWith(expectedMessage);
-      expect(result).toBeDefined();
+      expect(result).toEqual([
+        { topicName: 'test-topic', partition: 0, errorCode: 0 },
+      ]);
     });
 
     it('should throw error when sending message fails', async () => {
       mockProducer.send.mockRejectedValueOnce(new Error('Send failed'));
 
       await expect(
-        service.sendMessage(testTopic, testMessage, testContext),
+        service.sendMessage(testTopic, testMessage, testKey, testContext),
       ).rejects.toThrow('Send failed');
     });
   });
