@@ -62,8 +62,6 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
 
     try {
       const fetchedConversations = await ConversationsService.getConversations()
-
-      // Ensure each conversation has a messages array for reactivity
       const processedConversations = fetchedConversations
         .map((conv) => ({
           ...conv,
@@ -80,9 +78,10 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     }
   }
 
-  const createConversation = (): ConversationEntity => {
+  const createConversation = async (): Promise<ConversationEntity> => {
+    const id = await ConversationsService.generateConversationId()
     const newConversation: ConversationEntity = {
-      id: Date.now().toString(),
+      id,
       userId: undefined as any,
       user: undefined as any,
       createdAt: new Date(),
@@ -136,10 +135,9 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     let conversation = currentConversation.value
 
     if (!conversation) {
-      conversation = createConversation()
+      conversation = await createConversation()
     }
 
-    // Add user message immediately
     addMessage(conversation.id, content, 'user')
 
     const apiStore = useApiStore()
@@ -260,9 +258,10 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       await loadConversations()
     }
 
-    // If no conversations exist or no current conversation is selected, create a new one
-    if (conversations.value.length === 0 || !currentConversationId.value) {
-      createConversation()
+    if (conversations.value.length === 0) {
+      await createConversation()
+    } else if (!currentConversationId.value) {
+      currentConversationId.value = conversations.value[0].id
     }
   }
 
