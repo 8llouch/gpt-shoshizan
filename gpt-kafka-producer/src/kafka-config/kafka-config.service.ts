@@ -21,10 +21,16 @@ export class KafkaConfigService implements OnModuleInit {
     }
   }
 
-  async sendMessage(topic: string, message: any, ctx: string): Promise<any> {
+  async sendMessage(
+    topic: string,
+    message: any,
+    key: string,
+    ctx: string,
+  ): Promise<any> {
     this.logger.log(`Context: ${ctx} Sending message to topic ${topic}`);
     try {
       const kafkaMessage: Message = {
+        key: key,
         value: JSON.stringify(message),
       };
       const result = await this.producer.send({

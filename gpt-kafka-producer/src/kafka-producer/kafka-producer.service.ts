@@ -15,6 +15,7 @@ export class KafkaProducerService {
     await this.kafkaConfigService.sendMessage(
       topic,
       message,
+      message.conversationId,
       KafkaProducerService.name,
     );
   }
