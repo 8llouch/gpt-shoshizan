@@ -16,6 +16,7 @@ export interface Conversation {
   messages: Message[];
   responses: Message[];
   systemPrompt?: string;
+  context?: number[];
 }
 
 export interface ModelOptions {
@@ -55,6 +56,7 @@ export interface LlmResponseMessage {
   model: string;
   response: string;
   timestamp?: string;
+  context?: number[];
 }
 
 export interface ApiRequest {

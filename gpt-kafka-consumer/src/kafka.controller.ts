@@ -84,6 +84,17 @@ export class KafkaController {
         message,
       );
 
+      if (data.context && Array.isArray(data.context)) {
+        await this.conversationService.updateConversationContext(
+          data.conversationId,
+          data.context as number[],
+        );
+        this.logger.log(
+          'Conversation context updated for conversation ',
+          conversation.id,
+        );
+      }
+
       return { received: true, message: data };
     } catch (error) {
       this.logger.error(`Error processing output message: ${error}`);
