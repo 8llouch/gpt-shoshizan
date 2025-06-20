@@ -6,6 +6,7 @@ import {
   MessageEntity,
   UserEntity,
 } from '@shoshizan/shared-interfaces';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class ConversationsService {
@@ -19,6 +20,10 @@ export class ConversationsService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
+
+  generateConversationId(): string {
+    return v4();
+  }
 
   async getConversationsWithMessages(
     userId: string,
