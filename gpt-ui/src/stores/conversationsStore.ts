@@ -91,6 +91,7 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       responses: [],
       modelOptions: {} as ModelOptions,
       apiMetrics: {},
+      context: null,
     }
 
     conversations.value.unshift(newConversation)
@@ -129,6 +130,17 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     conversations.value[conversationIndex] = { ...conversation }
   }
 
+  const updateConversationContext = (conversationId: string, context: number[]) => {
+    const conversationIndex = conversations.value.findIndex((conv) => conv.id === conversationId)
+    if (conversationIndex === -1) return
+
+    const conversation = conversations.value[conversationIndex]
+    conversation.context = context
+    conversation.updatedAt = new Date()
+
+    conversations.value[conversationIndex] = { ...conversation }
+  }
+
   const sendMessage = async (content: string) => {
     if (!content.trim()) return
 
@@ -147,7 +159,9 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       // Clear previous response to avoid confusion
       apiStore.resetCurrentResponse()
 
-      const result = await apiStore.sendMessage(content, conversation.id)
+      const result = await apiStore.sendMessage(content, conversation.id, {
+        conversationContext: conversation.context || undefined,
+      })
 
       // Add assistant response
       if (apiStore.currentResponse) {
@@ -159,6 +173,11 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
         )
       } else if (result && result.response) {
         addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
+      }
+
+      // Update conversation context with the new context from the response
+      if (result && result.context) {
+        updateConversationContext(conversation.id, result.context)
       }
     } catch (error) {
       console.error('Error sending message:', error)
@@ -199,7 +218,9 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
 
     try {
       apiStore.resetCurrentResponse()
-      const result = await apiStore.sendMessage(lastUserMessage.content, conversation.id)
+      const result = await apiStore.sendMessage(lastUserMessage.content, conversation.id, {
+        conversationContext: conversation.context || undefined,
+      })
 
       if (apiStore.currentResponse) {
         addMessage(
@@ -210,6 +231,11 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
         )
       } else if (result && result.response) {
         addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
+      }
+
+      // Update conversation context with the new context from the response
+      if (result && result.context) {
+        updateConversationContext(conversation.id, result.context)
       }
     } catch (error) {
       console.error('Error regenerating response:', error)
@@ -225,7 +251,14 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
   const selectConversation = (conversationId: string) => {
     currentConversationId.value = conversationId
     const apiStore = useApiStore()
-    apiStore.clearContext()
+
+    // Restore context from the selected conversation
+    const conversation = conversations.value.find((conv) => conv.id === conversationId)
+    if (conversation && conversation.context) {
+      apiStore.setContext(conversation.context)
+    } else {
+      apiStore.clearContext()
+    }
   }
 
   const deleteConversation = async (conversationId: string) => {
@@ -262,6 +295,12 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       await createConversation()
     } else if (!currentConversationId.value) {
       currentConversationId.value = conversations.value[0].id
+      // Restore context for the first conversation
+      const firstConversation = conversations.value[0]
+      if (firstConversation.context) {
+        const apiStore = useApiStore()
+        apiStore.setContext(firstConversation.context)
+      }
     }
   }
 
@@ -289,6 +328,7 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     loadConversations,
     createConversation,
     addMessage,
+    updateConversationContext,
     sendMessage,
     regenerateResponse,
     selectConversation,
