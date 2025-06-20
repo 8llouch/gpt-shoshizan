@@ -11,12 +11,15 @@ export class ApiService {
   static async sendRequest(
     request: ApiRequest,
     onChunk?: (chunk: string) => void,
+    conversationContext?: number[],
   ): Promise<ApiResponse> {
     if (!request.conversationId) {
       throw new Error('conversationId is required')
     }
 
     const { model, prompt, context, system, options } = request
+
+    const contextToUse = conversationContext || context
 
     const ollamaResponse = await fetch(ApiService.LLM_API_URL, {
       method: 'POST',
@@ -27,7 +30,7 @@ export class ApiService {
         model,
         prompt,
         stream: true,
-        context,
+        context: contextToUse,
         system,
         options,
       }),
@@ -94,6 +97,7 @@ export class ApiService {
                 prompt: request.prompt,
                 system: request.system,
                 options: request.options,
+                context: contextLlm,
               }
               await fetch(ApiService.KAFKA_PRODUCER_URL_RESPONSE, {
                 method: 'POST',

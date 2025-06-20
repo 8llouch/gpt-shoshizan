@@ -64,6 +64,7 @@ export const useApiStore = defineStore('apiStore', () => {
       images?: string[]
       systemPrompt?: string
       temperature?: number
+      conversationContext?: number[]
     },
   ) => {
     const modelStore = useModelStore()
@@ -94,6 +95,7 @@ export const useApiStore = defineStore('apiStore', () => {
           }
           updateResponse(chunk)
         },
+        options?.conversationContext,
       )
 
       if (stream.response) {
