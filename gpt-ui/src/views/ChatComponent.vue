@@ -11,10 +11,6 @@ import ModelSelector from '../components/base/ModelSelector.vue'
 const conversationsStore = useConversationsStore()
 const apiStore = useApiStore()
 
-onMounted(() => {
-  conversationsStore.initialize()
-})
-
 const handleSendMessage = (message: string) => {
   conversationsStore.sendMessage(message)
 }
