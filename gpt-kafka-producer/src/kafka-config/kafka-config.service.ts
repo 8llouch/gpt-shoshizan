@@ -27,7 +27,9 @@ export class KafkaConfigService implements OnModuleInit {
     key: string,
     ctx: string,
   ): Promise<any> {
-    this.logger.log(`Context: ${ctx} Sending message to topic ${topic}`);
+    this.logger.log(
+      `Context: ${ctx} Sending message to topic ${topic} with conversation key ${key}`,
+    );
     try {
       const kafkaMessage: Message = {
         key: key,
