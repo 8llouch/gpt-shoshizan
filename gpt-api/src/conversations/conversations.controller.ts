@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Request,
+  Post,
 } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ConversationEntity, JwtPayload } from '@shoshizan/shared-interfaces';
@@ -16,6 +17,25 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 @Controller('conversations')
 export class ConversationsController {
   constructor(private readonly conversationsService: ConversationsService) {}
+
+  @ApiOperation({ summary: 'Generate a new conversation ID' })
+  @ApiResponse({
+    status: 201,
+    description: 'Conversation ID generated successfully',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post('generate-id')
+  generateConversationId(): { conversationId: string } {
+    try {
+      const conversationId = this.conversationsService.generateConversationId();
+      return { conversationId };
+    } catch {
+      throw new HttpException(
+        'Failed to generate conversation ID',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   @ApiOperation({ summary: 'Get all conversations for the user' })
   @ApiResponse({
