@@ -11,16 +11,19 @@ defineOptions({
 </script>
 
 <template>
-  <div class="theme-switcher">
+  <div class="theme-switcher" data-testid="theme-switcher">
     <button
       class="theme-button"
       @click="themeStore.toggleTheme()"
       :title="
         themeStore.currentTheme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')
       "
+      data-testid="theme-switcher-button"
     >
-      <span v-if="themeStore.currentTheme === 'light'" class="icon">🌙</span>
-      <span v-else class="icon">☀️</span>
+      <span v-if="themeStore.currentTheme === 'light'" class="icon" data-testid="theme-icon-moon"
+        >🌙</span
+      >
+      <span v-else class="icon" data-testid="theme-icon-sun">☀️</span>
     </button>
   </div>
 </template>

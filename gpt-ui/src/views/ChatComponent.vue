@@ -21,21 +21,23 @@ const handleRegenerateResponse = () => {
 </script>
 
 <template>
-  <GptLayout>
+  <GptLayout data-testid="chat-layout">
     <template #sidebar>
-      <Sidebar />
+      <Sidebar data-testid="chat-sidebar" />
     </template>
     <template #header>
-      <ModelSelector />
+      <ModelSelector data-testid="chat-model-selector" />
     </template>
     <template #conversation>
       <ConversationComponent
+        data-testid="chat-conversation"
         :messages="conversationsStore.currentMessages"
         :is-loading="apiStore.isLoading || apiStore.isStreaming"
       />
     </template>
     <template #user-input>
       <UserInputComponent
+        data-testid="chat-user-input"
         @send-message="handleSendMessage"
         @regenerate-response="handleRegenerateResponse"
       />

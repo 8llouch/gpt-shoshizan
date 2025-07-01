@@ -50,26 +50,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="conversation-container">
-    <div ref="conversationContainer" class="messages-container">
+  <div class="conversation-container" data-testid="conversation-container">
+    <div ref="conversationContainer" class="messages-container" data-testid="messages-container">
       <div
         v-for="message in displayMessages"
         :key="message.id"
         :class="`message-wrapper ${message.role}-message`"
+        :data-testid="`message-${message.role}`"
       >
-        <div class="message-container">
-          <div v-if="message.role === 'assistant'" class="avatar">
-            <span>{{ message.modelName || t('conversation.assistant') }}</span>
+        <div class="message-container" data-testid="message-container">
+          <div v-if="message.role === 'assistant'" class="avatar" data-testid="assistant-avatar">
+            <span data-testid="assistant-model">{{
+              message.modelName || t('conversation.assistant')
+            }}</span>
           </div>
 
-          <div class="message-content">
-            <div class="message-text" v-html="marked(message.content)"></div>
+          <div class="message-content" data-testid="message-content">
+            <div
+              class="message-text"
+              v-html="marked(message.content)"
+              data-testid="message-text"
+            ></div>
             <div class="message-meta">
-              <span class="timestamp">{{ formatTime(message.timestamp) }}</span>
+              <span class="timestamp" data-testid="message-timestamp">{{
+                formatTime(message.timestamp)
+              }}</span>
             </div>
           </div>
 
-          <div v-if="message.role === 'user'" class="avatar user-avatar">
+          <div v-if="message.role === 'user'" class="avatar user-avatar" data-testid="user-avatar">
             <span>👤</span>
           </div>
         </div>
@@ -78,6 +87,7 @@ onMounted(() => {
       <div
         v-if="props.isLoading && !apiStore.isStreaming"
         class="message-wrapper assistant-message"
+        data-testid="typing-indicator"
       >
         <div class="message-container">
           <div class="avatar">
@@ -95,7 +105,11 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-if="apiStore.isStreaming" class="message-wrapper assistant-message streaming">
+      <div
+        v-if="apiStore.isStreaming"
+        class="message-wrapper assistant-message streaming"
+        data-testid="streaming-message"
+      >
         <div class="message-container">
           <div class="avatar">
             <span>{{ modelStore.selectedModelName }}</span>
@@ -104,9 +118,12 @@ onMounted(() => {
             <div
               class="message-text streaming-text"
               v-html="marked(apiStore.currentResponse)"
+              data-testid="streaming-text"
             ></div>
             <div class="message-meta">
-              <span class="streaming-indicator">{{ t('conversation.streaming') }}</span>
+              <span class="streaming-indicator" data-testid="streaming-indicator">{{
+                t('conversation.streaming')
+              }}</span>
             </div>
           </div>
         </div>

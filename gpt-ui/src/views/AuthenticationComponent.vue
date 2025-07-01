@@ -77,12 +77,17 @@ const toggleMode = () => {
     <div class="auth-card">
       <h2>{{ isLoginMode ? 'Login' : 'Register' }}</h2>
 
-      <div v-if="errorMessage" class="error-message">
+      <div v-if="errorMessage" class="error-message" data-testid="auth-error-message">
         {{ errorMessage }}
       </div>
 
       <!-- Login Form -->
-      <form v-if="isLoginMode" @submit.prevent="handleLogin" class="auth-form">
+      <form
+        v-if="isLoginMode"
+        @submit.prevent="handleLogin"
+        class="auth-form"
+        data-testid="login-form"
+      >
         <div class="form-group">
           <label for="login-email">Email</label>
           <input
@@ -92,6 +97,7 @@ const toggleMode = () => {
             required
             placeholder="Enter your email"
             autocomplete="username"
+            data-testid="login-email"
           />
         </div>
 
@@ -104,16 +110,22 @@ const toggleMode = () => {
             required
             placeholder="Enter your password"
             autocomplete="current-password"
+            data-testid="login-password"
           />
         </div>
 
-        <button type="submit" :disabled="authStore.isLoading" class="auth-button">
+        <button
+          type="submit"
+          :disabled="authStore.isLoading"
+          class="auth-button"
+          data-testid="login-submit"
+        >
           {{ authStore.isLoading ? 'Logging in...' : 'Login' }}
         </button>
       </form>
 
       <!-- Register Form -->
-      <form v-else @submit.prevent="handleRegister" class="auth-form">
+      <form v-else @submit.prevent="handleRegister" class="auth-form" data-testid="register-form">
         <div class="form-group">
           <label for="register-name">Name</label>
           <input
@@ -122,6 +134,7 @@ const toggleMode = () => {
             type="text"
             required
             placeholder="Enter your name"
+            data-testid="register-name"
           />
         </div>
 
@@ -133,6 +146,7 @@ const toggleMode = () => {
             type="email"
             required
             placeholder="Enter your email"
+            data-testid="register-email"
           />
         </div>
 
@@ -144,10 +158,16 @@ const toggleMode = () => {
             type="password"
             required
             placeholder="Enter your password (min 8 characters)"
+            data-testid="register-password"
           />
         </div>
 
-        <button type="submit" :disabled="authStore.isLoading" class="auth-button">
+        <button
+          type="submit"
+          :disabled="authStore.isLoading"
+          class="auth-button"
+          data-testid="register-submit"
+        >
           {{ authStore.isLoading ? 'Registering...' : 'Register' }}
         </button>
       </form>
@@ -155,7 +175,12 @@ const toggleMode = () => {
       <div class="toggle-mode">
         <p>
           {{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}
-          <button type="button" @click="toggleMode" class="toggle-button">
+          <button
+            type="button"
+            @click="toggleMode"
+            class="toggle-button"
+            data-testid="toggle-auth-mode"
+          >
             {{ isLoginMode ? 'Register' : 'Login' }}
           </button>
         </p>

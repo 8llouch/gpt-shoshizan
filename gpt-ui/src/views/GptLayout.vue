@@ -1,18 +1,18 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="gpt-layout">
-    <div class="gpt-sidebar">
+  <div class="gpt-layout" data-testid="gpt-layout">
+    <div class="gpt-sidebar" data-testid="gpt-sidebar">
       <slot name="sidebar"></slot>
     </div>
-    <div class="gpt-main">
-      <div class="gpt-header">
+    <div class="gpt-main" data-testid="gpt-main">
+      <div class="gpt-header" data-testid="gpt-header">
         <slot name="header"></slot>
       </div>
-      <div class="gpt-conversation">
+      <div class="gpt-conversation" data-testid="gpt-conversation">
         <slot name="conversation"></slot>
       </div>
-      <div class="gpt-user-input">
+      <div class="gpt-user-input" data-testid="gpt-user-input">
         <slot name="user-input"></slot>
       </div>
     </div>

@@ -59,7 +59,7 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="sidebar-wrapper">
+  <div class="sidebar-wrapper" data-testid="sidebar-wrapper">
     <aside
       :class="[
         'sidebar',
@@ -67,23 +67,28 @@ const handleLogout = () => {
         isOpen ? 'translate-x-0' : '-translate-x-full',
         'md:static md:translate-x-0 md:w-64',
       ]"
+      data-testid="sidebar"
     >
-      <header class="sidebar-header">
-        <div class="logo-section">
-          <div class="logo">
-            <span class="logo-text">GPT</span>
+      <header class="sidebar-header" data-testid="sidebar-header">
+        <div class="logo-section" data-testid="sidebar-logo-section">
+          <div class="logo" data-testid="sidebar-logo">
+            <span class="logo-text" data-testid="sidebar-logo-text">GPT</span>
           </div>
-          <h3 class="app-title">{{ t('app.title') }}</h3>
+          <h3 class="app-title" data-testid="sidebar-app-title">{{ t('app.title') }}</h3>
         </div>
 
-        <button @click="startNewConversation" class="new-chat-btn">
-          <span class="plus-icon">+</span>
+        <button
+          @click="startNewConversation"
+          class="new-chat-btn"
+          data-testid="sidebar-new-chat-btn"
+        >
+          <span class="plus-icon" data-testid="sidebar-plus-icon">+</span>
           {{ t('sidebar.newConversation') }}
         </button>
       </header>
 
-      <div class="conversations-section">
-        <div class="conversations-list">
+      <div class="conversations-section" data-testid="sidebar-conversations-section">
+        <div class="conversations-list" data-testid="sidebar-conversations-list">
           <div
             v-for="conversation in conversations"
             :key="conversation.id"
@@ -92,25 +97,34 @@ const handleLogout = () => {
               { active: conversation.id === conversationsStore.currentConversationId },
             ]"
             @click="selectConversation(conversation.id)"
+            :data-testid="`sidebar-conversation-item-${conversation.id}`"
           >
-            <div class="conversation-content">
-              <span class="conversation-date">{{ formatDate(conversation.createdAt) }}</span>
+            <div class="conversation-content" data-testid="sidebar-conversation-content">
+              <span class="conversation-date" data-testid="sidebar-conversation-date">{{
+                formatDate(conversation.createdAt)
+              }}</span>
             </div>
-            <button class="conversation-menu" @click="deleteConversation(conversation.id, $event)">
+            <button
+              class="conversation-menu"
+              @click="deleteConversation(conversation.id, $event)"
+              :data-testid="`sidebar-conversation-delete-${conversation.id}`"
+            >
               🗑️
             </button>
           </div>
         </div>
       </div>
 
-      <footer class="sidebar-footer">
-        <div class="user-section">
-          <div class="user-avatar">👤</div>
-          <div class="user-info">
-            <span class="user-name">{{ t('sidebar.user') }}</span>
-            <span class="user-status">{{ t('sidebar.online') }}</span>
+      <footer class="sidebar-footer" data-testid="sidebar-footer">
+        <div class="user-section" data-testid="sidebar-user-section">
+          <div class="user-avatar" data-testid="sidebar-user-avatar">👤</div>
+          <div class="user-info" data-testid="sidebar-user-info">
+            <span class="user-name" data-testid="sidebar-user-name">{{ t('sidebar.user') }}</span>
+            <span class="user-status" data-testid="sidebar-user-status">{{
+              t('sidebar.online')
+            }}</span>
           </div>
-          <button @click="handleLogout" class="logout-btn">
+          <button @click="handleLogout" class="logout-btn" data-testid="sidebar-logout-btn">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"

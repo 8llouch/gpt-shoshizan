@@ -59,9 +59,9 @@ const regenerateResponse = async () => {
 </script>
 
 <template>
-  <div class="user-input-container">
-    <div class="input-wrapper">
-      <div class="input-box">
+  <div class="user-input-container" data-testid="user-input-container">
+    <div class="input-wrapper" data-testid="input-wrapper">
+      <div class="input-box" data-testid="input-box">
         <textarea
           ref="textarea"
           v-model="message"
@@ -71,30 +71,42 @@ const regenerateResponse = async () => {
           rows="1"
           class="message-input"
           :disabled="!apiStore.canSendMessage"
+          data-testid="message-input"
         />
         <button
           @click="sendMessage"
           :disabled="!message.trim() || !apiStore.canSendMessage"
           class="send-button"
           :class="{ disabled: !message.trim() || !apiStore.canSendMessage }"
+          data-testid="send-button"
         >
-          <span v-if="!apiStore.isLoading && !apiStore.isStreaming" class="send-icon">↗</span>
-          <span v-else class="loading-icon">⟳</span>
+          <span
+            v-if="!apiStore.isLoading && !apiStore.isStreaming"
+            class="send-icon"
+            data-testid="send-icon"
+            >↗</span
+          >
+          <span v-else class="loading-icon" data-testid="loading-icon">⟳</span>
         </button>
       </div>
-      <div class="actions">
+      <div class="actions" data-testid="actions">
         <button
           @click="regenerateResponse"
           :disabled="!apiStore.canSendMessage"
           class="regenerate-button"
+          data-testid="regenerate-button"
         >
-          <span class="regenerate-icon">↻</span>
+          <span class="regenerate-icon" data-testid="regenerate-icon">↻</span>
           {{ t('userInput.regenerate') }}
         </button>
-        <div v-if="apiStore.error" class="error-message">
+        <div v-if="apiStore.error" class="error-message" data-testid="error-message">
           {{ apiStore.error }}
         </div>
-        <div v-if="apiStore.isStreaming" class="streaming-indicator">
+        <div
+          v-if="apiStore.isStreaming"
+          class="streaming-indicator"
+          data-testid="streaming-indicator"
+        >
           {{ t('userInput.sending') }}
         </div>
       </div>

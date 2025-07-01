@@ -17,8 +17,8 @@ const handleModelChange = (event: Event) => {
 </script>
 
 <template>
-  <div class="model-selector">
-    <label for="model-select" class="model-label">
+  <div class="model-selector" data-testid="model-selector">
+    <label for="model-select" class="model-label" data-testid="model-label">
       {{ t('model.label') }}
     </label>
     <select
@@ -26,8 +26,14 @@ const handleModelChange = (event: Event) => {
       :value="modelStore.selectedModel"
       @change="handleModelChange"
       class="model-select"
+      data-testid="model-select"
     >
-      <option v-for="option in MODEL_OPTIONS" :key="option.value" :value="option.value">
+      <option
+        v-for="option in MODEL_OPTIONS"
+        :key="option.value"
+        :value="option.value"
+        :data-testid="`model-option-${option.value}`"
+      >
         {{ option.text }}
       </option>
     </select>
