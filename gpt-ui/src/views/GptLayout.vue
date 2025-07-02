@@ -75,25 +75,20 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .gpt-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    z-index: 50;
-    transform: translateX(-100%);
-    width: 85%;
-    max-width: 300px;
-  }
-
-  .gpt-sidebar.open {
-    transform: translateX(0);
+    /* Completely remove sidebar from layout on mobile */
+    display: none;
+    width: 0;
+    min-width: 0;
+    max-width: 0;
+    flex: none;
   }
 
   .gpt-main {
     width: 100%;
     margin-left: 0;
+    flex: 1;
   }
 }
 </style>

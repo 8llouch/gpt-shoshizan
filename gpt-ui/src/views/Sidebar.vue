@@ -1,9 +1,21 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useConversationsStore } from '../stores/conversationsStore'
 import { useAuthStore } from '../stores/authStore'
+
+interface Props {
+  isOpen?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isOpen: false,
+})
+
+const emit = defineEmits<{
+  toggle: []
+}>()
 
 const conversationsStore = useConversationsStore()
 const authStore = useAuthStore()
@@ -11,7 +23,6 @@ const router = useRouter()
 
 const { t } = useI18n()
 
-const isOpen = ref(false)
 const conversations = computed(() =>
   conversationsStore.conversations.map((conv) => ({
     id: conv.id,
@@ -21,7 +32,7 @@ const conversations = computed(() =>
 )
 
 const toggleSidebar = () => {
-  isOpen.value = !isOpen.value
+  emit('toggle')
 }
 
 const startNewConversation = () => {
@@ -56,17 +67,27 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/auth')
 }
+
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+onMounted(() => window.addEventListener('resize', updateWidth))
+onUnmounted(() => window.removeEventListener('resize', updateWidth))
 </script>
 
 <template>
   <div class="sidebar-wrapper" data-testid="sidebar-wrapper">
+    <!-- Backdrop overlay for mobile -->
+    <div
+      v-if="props.isOpen"
+      class="sidebar-backdrop"
+      @click="emit('toggle')"
+      data-testid="sidebar-backdrop"
+    ></div>
+
     <aside
-      :class="[
-        'sidebar',
-        'fixed top-0 left-0 h-full w-4/5 max-w-xs z-50 transition-transform',
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        'md:static md:translate-x-0 md:w-64',
-      ]"
+      :class="['sidebar', 'transition-transform', props.isOpen ? 'sidebar-open' : 'sidebar-closed']"
       data-testid="sidebar"
     >
       <header class="sidebar-header" data-testid="sidebar-header">
@@ -124,7 +145,37 @@ const handleLogout = () => {
               t('sidebar.online')
             }}</span>
           </div>
-          <button @click="handleLogout" class="logout-btn" data-testid="sidebar-logout-btn">
+          <!-- Desktop logout button -->
+          <button
+            v-if="windowWidth >= 768"
+            @click="handleLogout"
+            class="logout-btn"
+            data-testid="sidebar-logout-btn-desktop"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-log-out"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+          </button>
+          <!-- Mobile logout button -->
+          <button
+            v-else
+            @click="handleLogout"
+            class="logout-btn"
+            data-testid="sidebar-logout-btn-mobile"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -155,6 +206,47 @@ const handleLogout = () => {
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: transform 0.3s ease;
+  height: 100vh; /* Ensure full height */
+  position: relative; /* For absolute positioned footer */
+}
+
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+/* Mobile positioning - overlay above content */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 85%;
+    max-width: 300px;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Desktop positioning - always visible */
+@media (min-width: 768px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    max-width: none;
+    z-index: auto;
+    box-shadow: none;
+  }
+
+  .sidebar-closed,
+  .sidebar-open {
+    transform: none;
+  }
 }
 
 .sidebar-header {
@@ -221,6 +313,7 @@ const handleLogout = () => {
   flex: 1;
   overflow-y: auto;
   padding: 0.5rem;
+  padding-bottom: 5rem; /* Account for absolute positioned footer */
 }
 
 .conversations-list {
@@ -393,10 +486,21 @@ const handleLogout = () => {
   border-radius: 2px;
 }
 
-@media (max-width: 768px) {
-  .sidebar {
-    width: 85%;
-    max-width: 300px;
+.sidebar-wrapper {
+  position: relative;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  /* Only show on mobile */
+  @media (min-width: 768px) {
+    display: none;
   }
 }
 </style>
