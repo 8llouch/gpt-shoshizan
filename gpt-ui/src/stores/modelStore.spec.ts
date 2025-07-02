@@ -24,4 +24,18 @@ describe('modelStore', () => {
     store.reset()
     expect(store.selectedModel).toBe('llama3.2')
   })
+
+  it('getSelectedModel computed', () => {
+    const store = useModelStore()
+    expect(store.getSelectedModel).toBe('llama3.2')
+    store.setSelectedModel('foo')
+    expect(store.getSelectedModel).toBe('foo')
+  })
+
+  it('selectedModelName computed', () => {
+    const store = useModelStore()
+    expect(typeof store.selectedModelName).toBe('string')
+    store.setSelectedModel('llama3.2')
+    expect(store.selectedModelName).toBeDefined()
+  })
 })
