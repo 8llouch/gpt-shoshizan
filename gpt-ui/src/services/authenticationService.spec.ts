@@ -4,6 +4,8 @@ import { AuthenticationService } from './authenticationService'
 describe('AuthenticationService', () => {
   beforeEach(() => {
     global.fetch = vi.fn()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'log').mockImplementation(() => {})
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -18,5 +20,17 @@ describe('AuthenticationService', () => {
   it('login error', async () => {
     ;(fetch as any).mockResolvedValue({ ok: false, statusText: 'fail' })
     await expect(AuthenticationService.login('a', 'b')).rejects.toThrow('Login failed: fail')
+  })
+
+  it('register success', async () => {
+    ;(fetch as any).mockResolvedValue({ ok: true })
+    await expect(AuthenticationService.register('a', 'b', 'n')).resolves.toBeUndefined()
+  })
+
+  it('register error', async () => {
+    ;(fetch as any).mockResolvedValue({ ok: false, statusText: 'fail' })
+    await expect(AuthenticationService.register('a', 'b', 'n')).rejects.toThrow(
+      'Registration failed: fail',
+    )
   })
 })
