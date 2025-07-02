@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "playwright test && npx playwright show-report",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
