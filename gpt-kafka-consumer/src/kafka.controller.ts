@@ -87,7 +87,7 @@ export class KafkaController {
       if (data.context && Array.isArray(data.context)) {
         await this.conversationService.updateConversationContext(
           data.conversationId,
-          data.context as number[],
+          data.context,
         );
         this.logger.log(
           'Conversation context updated for conversation ',
