@@ -101,6 +101,7 @@ describe('ConversationsService', () => {
         systemPrompt: undefined,
         modelOptions: undefined,
         responses: [],
+        context: null,
       });
       expect(conversationRepository.save).toHaveBeenCalled();
     });
@@ -134,6 +135,7 @@ describe('ConversationsService', () => {
         systemPrompt: undefined,
         modelOptions: undefined,
         responses: [],
+        context: null,
       });
       expect(conversationRepository.save).toHaveBeenCalled();
     });
@@ -155,6 +157,7 @@ describe('ConversationsService', () => {
         systemPrompt: undefined,
         modelOptions: undefined,
         responses: [],
+        context: null,
       });
       expect(conversationRepository.save).toHaveBeenCalled();
     });

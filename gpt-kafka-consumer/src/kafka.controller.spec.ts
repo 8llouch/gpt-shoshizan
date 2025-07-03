@@ -69,6 +69,7 @@ describe('KafkaController', () => {
           eval_duration: 0,
           eval_count: 0,
         },
+        context: null,
       };
 
       const mockMessage: MessageEntity = {
@@ -155,6 +156,7 @@ describe('KafkaController', () => {
           eval_duration: 0,
           eval_count: 0,
         },
+        context: null,
       };
 
       const mockMessage: MessageEntity = {
