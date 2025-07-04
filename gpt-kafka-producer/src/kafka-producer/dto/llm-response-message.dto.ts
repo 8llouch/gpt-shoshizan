@@ -1,42 +1,30 @@
 import {
   IsString,
+  IsNotEmpty,
   IsOptional,
-  IsBoolean,
   IsArray,
   IsNumber,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ModelOptionsDto } from './model-options.dto';
 
 export class LlmResponseMessageDto {
   @IsString()
+  @IsNotEmpty()
+  conversationId: string;
+
+  @IsString()
+  @IsNotEmpty()
   model: string;
 
   @IsString()
-  prompt: string;
-
-  @IsString()
+  @IsNotEmpty()
   response: string;
 
+  @IsString()
   @IsOptional()
-  @IsBoolean()
-  done?: boolean;
+  timestamp?: string;
 
-  @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
+  @IsOptional()
   context?: number[];
-
-  @IsOptional()
-  @IsString()
-  system?: string;
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => ModelOptionsDto)
-  options?: ModelOptionsDto;
-
-  @IsString()
-  conversationId: string;
 }

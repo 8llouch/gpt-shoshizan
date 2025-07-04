@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { KafkaConfigService } from '../kafka-config/kafka-config.service';
 import { Retry } from '../common/decorators/retry.decorator';
-import { LlmRequestMessage } from '@shoshizan/shared-interfaces';
+import {
+  LlmRequestMessage,
+  LlmResponseMessage,
+} from '@shoshizan/shared-interfaces';
 
 @Injectable()
 export class KafkaProducerService {
@@ -11,6 +14,19 @@ export class KafkaProducerService {
   async produceMessage(
     topic: string,
     message: LlmRequestMessage,
+  ): Promise<void> {
+    await this.kafkaConfigService.sendMessage(
+      topic,
+      message,
+      message.conversationId,
+      KafkaProducerService.name,
+    );
+  }
+
+  @Retry(3, 1000)
+  async produceResponseMessage(
+    topic: string,
+    message: LlmResponseMessage,
   ): Promise<void> {
     await this.kafkaConfigService.sendMessage(
       topic,

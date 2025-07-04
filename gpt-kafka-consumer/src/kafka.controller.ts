@@ -60,15 +60,25 @@ export class KafkaController {
   @MessagePattern('output.created')
   async handleOutputCreated(@Payload() data: LlmResponseMessage) {
     try {
-      const conversation = await this.conversationService.getConversation(
+      let conversation = await this.conversationService.getConversation(
         data.conversationId,
       );
 
       if (!conversation) {
-        this.logger.warn(
-          `Conversation with ID ${data.conversationId} not found`,
+        this.logger.log(
+          `Conversation with ID ${data.conversationId} not found, creating it for AI response`,
         );
-        return { received: false, message: data };
+        // Create conversation for AI response if it doesn't exist
+        conversation = await this.conversationService.createConversation(
+          data.conversationId,
+          undefined, // no system prompt from AI response
+          undefined, // no model options from AI response
+          undefined, // no user ID from AI response
+        );
+        this.logger.log(
+          'Conversation created for AI response: ',
+          conversation.id,
+        );
       }
 
       const message = await this.conversationService.addMessage(

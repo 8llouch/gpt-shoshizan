@@ -10,7 +10,11 @@ import { KafkaProducerService } from './kafka-producer.service';
 import { LlmRequestMessageDto } from './dto/llm-request-message.dto';
 import { LlmResponseMessageDto } from './dto/llm-response-message.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-authentication.guard';
-import { JwtPayload, LlmRequestMessage } from '@shoshizan/shared-interfaces';
+import {
+  JwtPayload,
+  LlmRequestMessage,
+  LlmResponseMessage,
+} from '@shoshizan/shared-interfaces';
 
 @Controller('message-producer')
 export class KafkaProducerController {
@@ -57,17 +61,18 @@ export class KafkaProducerController {
     const userId = req.user.sub;
     this.logger.log(`Sending AI response to Kafka for user ${userId}`);
 
-    const message: LlmRequestMessage = {
-      userId,
+    const message: LlmResponseMessage = {
       conversationId: llmResponseMessageDto.conversationId,
       model: llmResponseMessageDto.model,
-      prompt: llmResponseMessageDto.prompt,
-      system: llmResponseMessageDto.system,
-      options: llmResponseMessageDto.options || { num_predict: 100 },
-      timestamp: new Date().toISOString(),
+      response: llmResponseMessageDto.response,
+      timestamp: llmResponseMessageDto.timestamp || new Date().toISOString(),
+      context: llmResponseMessageDto.context,
     };
 
-    await this.kafkaProducerService.produceMessage('output.created', message);
+    await this.kafkaProducerService.produceResponseMessage(
+      'output.created',
+      message,
+    );
 
     return {
       status: 'success',
