@@ -9,26 +9,38 @@ Shoshizan is a microservices-based application that handles GPT requests through
 ## Architecture
 
 ```
-┌─────────────┐     ┌───────────────┐     ┌───────────────┐
-│   GPT-UI    │────▶│ Kafka Producer│────▶│    Kafka     │
-└─────────────┘     └───────────────┘     └───────────────┘
-                                                    │
-                                                    ▼
-┌─────────────┐     ┌───────────────┐     ┌───────────────┐
-│  Response   │◀────│  GPT API      │◀────│Kafka Consumer│
-└─────────────┘     └───────────────┘     └───────────────┘
+┌─────────────┐     ┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+│   GPT-UI    │────▶│   Gateway     │────▶│ Kafka Producer│────▶│    Kafka     │
+└─────────────┘     └───────────────┘     └───────────────┘     └───────────────┘
+                              │                                              │
+                              ▼                                              ▼
+                     ┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+                     │  GPT API      │◀────│Kafka Consumer│◀────│    Kafka     │
+                     └───────────────┘     └───────────────┘     └───────────────┘
 ```
 
 ## Services
 
-### 1. GPT-UI (`gpt-ui/`)
+### 1. Gateway (`gpt-gateway/`)
+
+- **NEW**: Centralized gateway service for all microservices
+- Provides unified authentication and routing
+- Acts as a single entry point for all client requests
+- Features:
+  - JWT-based authentication
+  - Service routing and load balancing
+  - Health monitoring for all services
+  - API documentation with Swagger
+  - CORS configuration
+
+### 2. GPT-UI (`gpt-ui/`)
 
 - Frontend application built with Vue
 - Provides user interface for GPT interactions
 - Handles conversation management and user input
-- Communicates with Kafka Producer for message sending
+- Communicates with Gateway for all API calls
 
-### 2. Kafka Producer (`gpt-kafka-producer/`)
+### 3. Kafka Producer (`gpt-kafka-producer/`)
 
 - NestJS service for producing messages to Kafka
 - Implements retry mechanism for reliable message delivery
@@ -38,7 +50,7 @@ Shoshizan is a microservices-based application that handles GPT requests through
   - Error handling
   - Comprehensive logging
 
-### 3. Kafka Consumer (`gpt-kafka-consumer/`)
+### 4. Kafka Consumer (`gpt-kafka-consumer/`)
 
 - Consumes messages from Kafka topics
 - Processes GPT requests
@@ -48,7 +60,7 @@ Shoshizan is a microservices-based application that handles GPT requests through
   - Error recovery
   - Dead letter queue handling
 
-### 4. GPT API (`gpt-api/`)
+### 5. GPT API (`gpt-api/`)
 
 - Core service for GPT model interaction
 - Handles model selection and configuration
@@ -58,7 +70,7 @@ Shoshizan is a microservices-based application that handles GPT requests through
   - Response streaming
   - Error handling
 
-### 5. Shared Interfaces (`shared-interfaces/`)
+### 6. Shared Interfaces (`shared-interfaces/`)
 
 - Common TypeScript interfaces and types
 - Shared between all services
@@ -93,6 +105,9 @@ cd shared-interfaces
 npm install
 
 # Install and build each service
+cd ../gpt-gateway
+npm install
+
 cd ../gpt-ui
 npm install
 
@@ -111,10 +126,16 @@ npm install
 4. Start the services:
 
 ```bash
-# Start Kafka
+# Start all services together (recommended)
+npm run dev
 
-# Start each service in development mode or debug
-cd gpt-ui
+# Or start services individually:
+# Start Gateway (must be started first)
+cd gpt-gateway
+npm run start:dev
+
+# Start other services
+cd ../gpt-ui
 npm run dev
 
 cd ../gpt-kafka-producer
