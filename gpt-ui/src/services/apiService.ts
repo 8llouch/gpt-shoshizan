@@ -4,9 +4,9 @@ import { useAuthStore } from '../stores/authStore'
 export class ApiService {
   private static readonly LLM_API_URL = 'http://localhost:11434/api/generate'
   private static readonly KAFKA_PRODUCER_URL_INPUTS =
-    'http://localhost:3000/message-producer/ai-inputs'
+    'http://localhost:3000/gateway/producer/message-producer/ai-inputs'
   private static readonly KAFKA_PRODUCER_URL_RESPONSE =
-    'http://localhost:3000/message-producer/ai-outputs'
+    'http://localhost:3000/gateway/producer/message-producer/ai-outputs'
 
   static async sendRequest(
     request: ApiRequest,
