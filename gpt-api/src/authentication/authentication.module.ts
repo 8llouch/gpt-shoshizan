@@ -3,8 +3,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './authentication.service';
-import { AuthController } from './authentication.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserEntity } from '@shoshizan/shared-interfaces';
 
@@ -20,8 +18,6 @@ import { UserEntity } from '@shoshizan/shared-interfaces';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
-  controllers: [AuthController],
-  exports: [AuthService],
+  providers: [JwtStrategy],
 })
 export class AuthModule {}

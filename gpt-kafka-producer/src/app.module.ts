@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { KafkaConfigModule } from './kafka-config/kafka-config.module';
 import { KafkaProducerModule } from './kafka-producer/kafka-producer.module';
 
@@ -23,7 +21,5 @@ import { KafkaProducerModule } from './kafka-producer/kafka-producer.module';
     KafkaConfigModule,
     KafkaProducerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
