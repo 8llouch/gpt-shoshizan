@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/authStore'
 import type { ConversationEntity } from '@shoshizan/shared-interfaces'
 
 export class ConversationsService {
-  private static readonly API_BASE_URL = 'http://localhost:3001'
+  private static readonly API_BASE_URL = 'http://localhost:3000'
 
   static async generateConversationId(): Promise<string> {
     try {
@@ -17,7 +17,7 @@ export class ConversationsService {
       }
 
       const response = await fetch(
-        `${ConversationsService.API_BASE_URL}/conversations/generate-id`,
+        `${ConversationsService.API_BASE_URL}/gateway/api/conversations/generate-id`,
         {
           method: 'POST',
           headers,
@@ -47,10 +47,13 @@ export class ConversationsService {
       if (authHeaders.Authorization) {
         headers.Authorization = authHeaders.Authorization
       }
-      const response = await fetch(`${ConversationsService.API_BASE_URL}/conversations`, {
-        method: 'GET',
-        headers,
-      })
+      const response = await fetch(
+        `${ConversationsService.API_BASE_URL}/gateway/api/conversations`,
+        {
+          method: 'GET',
+          headers,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Failed to fetch conversations: ${response.statusText}`)
@@ -74,10 +77,13 @@ export class ConversationsService {
       if (authHeaders.Authorization) {
         headers.Authorization = authHeaders.Authorization
       }
-      const response = await fetch(`${ConversationsService.API_BASE_URL}/conversations/${id}`, {
-        method: 'DELETE',
-        headers,
-      })
+      const response = await fetch(
+        `${ConversationsService.API_BASE_URL}/gateway/api/conversations/${id}`,
+        {
+          method: 'DELETE',
+          headers,
+        },
+      )
 
       if (!response.ok) {
         throw new Error(`Failed to delete conversation: ${response.statusText}`)

@@ -1,5 +1,5 @@
 export class AuthenticationService {
-  private static readonly API_BASE_URL = 'http://localhost:3001'
+  private static readonly API_BASE_URL = 'http://localhost:3000'
 
   static async login(email: string, password: string): Promise<string> {
     try {

@@ -2,9 +2,11 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/authStore'
+import { useConversationsStore } from '@/stores/conversationsStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const conversationsStore = useConversationsStore()
 
 const isLoginMode = ref(true)
 const isLoading = ref(false)
@@ -32,6 +34,8 @@ const handleLogin = async () => {
 
   try {
     await authStore.login(loginForm.email, loginForm.password)
+    await conversationsStore.loadConversations()
+    conversationsStore.currentConversationId = conversationsStore.conversations[0].id
     router.push('/chat')
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Login failed'
