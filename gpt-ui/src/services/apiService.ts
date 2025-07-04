@@ -1,12 +1,11 @@
 import type { ApiRequest, ApiResponse } from '@shoshizan/shared-interfaces'
 import { useAuthStore } from '../stores/authStore'
+import { API_CONFIG } from '../constants'
 
 export class ApiService {
-  private static readonly LLM_API_URL = 'http://localhost:11434/api/generate'
-  private static readonly KAFKA_PRODUCER_URL_INPUTS =
-    'http://localhost:3000/gateway/producer/message-producer/ai-inputs'
-  private static readonly KAFKA_PRODUCER_URL_RESPONSE =
-    'http://localhost:3000/gateway/producer/message-producer/ai-outputs'
+  private static readonly LLM_API_URL = API_CONFIG.LLM_API_URL
+  private static readonly KAFKA_PRODUCER_URL_INPUTS = API_CONFIG.KAFKA_PRODUCER_URL_INPUTS
+  private static readonly KAFKA_PRODUCER_URL_RESPONSE = API_CONFIG.KAFKA_PRODUCER_URL_OUTPUTS
 
   static async sendRequest(
     request: ApiRequest,
@@ -21,11 +20,19 @@ export class ApiService {
 
     const contextToUse = conversationContext || context
 
+    const authStore = useAuthStore()
+    const authHeaders = authStore.getAuthHeaders()
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (authHeaders.Authorization) {
+      headers.Authorization = authHeaders.Authorization
+    }
+
     const ollamaResponse = await fetch(ApiService.LLM_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         model,
         prompt,
@@ -33,6 +40,7 @@ export class ApiService {
         context: contextToUse,
         system,
         options,
+        conversationId: request.conversationId,
       }),
     })
 
@@ -75,16 +83,6 @@ export class ApiService {
               context: contextLlm,
             }
             try {
-              const authStore = useAuthStore()
-              const authHeaders = authStore.getAuthHeaders()
-              const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-              }
-
-              if (authHeaders.Authorization) {
-                headers.Authorization = authHeaders.Authorization
-              }
-
               await fetch(ApiService.KAFKA_PRODUCER_URL_INPUTS, {
                 method: 'POST',
                 headers,

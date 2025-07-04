@@ -1,5 +1,7 @@
+import { API_CONFIG } from '../constants'
+
 export class AuthenticationService {
-  private static readonly API_BASE_URL = 'http://localhost:3000'
+  private static readonly API_BASE_URL = API_CONFIG.AUTH_BASE_URL
 
   static async login(email: string, password: string): Promise<string> {
     try {
