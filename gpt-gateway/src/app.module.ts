@@ -7,6 +7,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./authentication/authentication.module";
 import { GatewayModule } from "./gateway/gateway.module";
+import { OllamaModule } from "./ollama/ollama.module";
 import { UserEntity } from "@shoshizan/shared-interfaces";
 
 @Module({
@@ -40,6 +41,7 @@ import { UserEntity } from "@shoshizan/shared-interfaces";
     }),
     AuthModule,
     GatewayModule,
+    OllamaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
