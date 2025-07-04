@@ -33,4 +33,7 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Gateway service is running on port ${port}`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("Error starting application:", error);
+  process.exit(1);
+});
