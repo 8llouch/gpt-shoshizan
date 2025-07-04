@@ -12,10 +12,10 @@
     "shared-interfaces"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others --names \"GATEWAY,API,CONSUMER,PRODUCER,UI\" --prefix-colors \"red,blue,green,yellow,magenta\" \"npm run dev:gateway\" \"npm run dev:api\" \"npm run dev:consumer\" \"npm run dev:producer\" \"npm run dev:ui\"",
+    "dev": "concurrently --kill-others --names \"GATEWAY,API,CONSUMER,PRODUCER,UI\" --prefix-colors \"red,blue,green,yellow,magenta\" \"npm run dev:gateway\" \"npm run dev:api\" \"npm run dev:consumer\" \"npm run dev:producer\" \"sleep 3 && npm run dev:ui\"",
     "dev:gateway": "npm run start:dev --workspace=gpt-gateway",
     "dev:ui": "npm run dev --workspace=gpt-ui",
-    "debug": "concurrently --kill-others --names \"GATEWAY,API,CONSUMER,PRODUCER,UI\" --prefix-colors \"red,blue,green,yellow,magenta\" \"npm run debug:gateway\" \"npm run debug:api\" \"npm run debug:consumer\" \"npm run debug:producer\" \"npm run dev:ui\"",
+    "debug": "concurrently --kill-others --names \"GATEWAY,API,CONSUMER,PRODUCER,UI\" --prefix-colors \"red,blue,green,yellow,magenta\" \"npm run debug:gateway\" \"npm run debug:api\" \"npm run debug:consumer\" \"npm run debug:producer\" \"sleep 3 && npm run dev:ui\"",
     "debug:gateway": "npm run start:debug --workspace=gpt-gateway",
     "debug:api": "npm run start:debug --workspace=gpt-api",
     "debug:consumer": "npm run start:debug --workspace=gpt-kafka-consumer",
