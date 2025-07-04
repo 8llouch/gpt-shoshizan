@@ -1,42 +1,78 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Logger,
+} from '@nestjs/common';
 import { KafkaProducerService } from './kafka-producer.service';
 import { LlmRequestMessageDto } from './dto/llm-request-message.dto';
-import { LlmRequestMessage, JwtPayload } from '@shoshizan/shared-interfaces';
+import { LlmResponseMessageDto } from './dto/llm-response-message.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-authentication.guard';
+import { JwtPayload, LlmRequestMessage } from '@shoshizan/shared-interfaces';
 
 @Controller('message-producer')
 export class KafkaProducerController {
-  constructor(
-    private readonly producerService: KafkaProducerService,
-    private readonly jwtService: JwtService,
-  ) {}
+  private readonly logger = new Logger(KafkaProducerController.name);
+
+  constructor(private readonly kafkaProducerService: KafkaProducerService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('ai-inputs')
   async sendUserInput(
-    @Body() input: LlmRequestMessageDto,
+    @Body() llmRequestMessageDto: LlmRequestMessageDto,
     @Request() req: { user: JwtPayload },
   ) {
+    const userId = req.user.sub;
+    this.logger.log(`Sending user input to Kafka for user ${userId}`);
+
     const message: LlmRequestMessage = {
-      ...input,
+      userId,
+      conversationId: llmRequestMessageDto.conversationId,
+      model: llmRequestMessageDto.model,
+      prompt: llmRequestMessageDto.prompt,
+      stream: llmRequestMessageDto.stream,
+      images: llmRequestMessageDto.images,
+      system: llmRequestMessageDto.system,
+      options: llmRequestMessageDto.options || { num_predict: 100 },
       timestamp: new Date().toISOString(),
-      userId: req.user.sub,
     };
-    return this.producerService.produceMessage('input.created', message);
+
+    await this.kafkaProducerService.produceMessage('input.created', message);
+
+    return {
+      status: 'success',
+      message: 'User input sent to Kafka successfully',
+      conversationId: llmRequestMessageDto.conversationId,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('ai-outputs')
-  async sendAiOutput(
-    @Body() output: LlmRequestMessageDto,
+  async sendAiResponse(
+    @Body() llmResponseMessageDto: LlmResponseMessageDto,
     @Request() req: { user: JwtPayload },
   ) {
+    const userId = req.user.sub;
+    this.logger.log(`Sending AI response to Kafka for user ${userId}`);
+
     const message: LlmRequestMessage = {
-      ...output,
+      userId,
+      conversationId: llmResponseMessageDto.conversationId,
+      model: llmResponseMessageDto.model,
+      prompt: llmResponseMessageDto.prompt,
+      system: llmResponseMessageDto.system,
+      options: llmResponseMessageDto.options || { num_predict: 100 },
       timestamp: new Date().toISOString(),
-      userId: req.user.sub,
     };
-    return this.producerService.produceMessage('output.created', message);
+
+    await this.kafkaProducerService.produceMessage('output.created', message);
+
+    return {
+      status: 'success',
+      message: 'AI response sent to Kafka successfully',
+      conversationId: llmResponseMessageDto.conversationId,
+    };
   }
 }
