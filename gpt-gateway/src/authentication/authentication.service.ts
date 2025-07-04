@@ -11,10 +11,12 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ user: Partial<UserEntity>; token: string }> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ user: Partial<UserEntity>; token: string }> {
     const { email, password, name } = registerDto;
 
     const existingUser = await this.usersRepository.findOne({
@@ -40,12 +42,16 @@ export class AuthService {
       role: user.role,
     });
 
-    const userWithoutPassword = Object.fromEntries(Object.entries(user).filter(([key]) => key !== "password"));
+    const userWithoutPassword = Object.fromEntries(
+      Object.entries(user).filter(([key]) => key !== "password"),
+    );
 
     return { user: userWithoutPassword, token };
   }
 
-  async login(loginDto: LoginDto): Promise<{ user: Partial<UserEntity>; token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ user: Partial<UserEntity>; token: string }> {
     const { email, password } = loginDto;
 
     const user = await this.usersRepository.findOne({ where: { email } });
@@ -64,7 +70,9 @@ export class AuthService {
       role: user.role,
     });
 
-    const userWithoutPassword = Object.fromEntries(Object.entries(user).filter(([key]) => key !== "password"));
+    const userWithoutPassword = Object.fromEntries(
+      Object.entries(user).filter(([key]) => key !== "password"),
+    );
 
     return { user: userWithoutPassword, token };
   }

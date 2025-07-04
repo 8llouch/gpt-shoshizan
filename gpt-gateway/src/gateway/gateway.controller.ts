@@ -1,4 +1,12 @@
-import { Controller, All, Req, Res, UseGuards, HttpStatus, HttpException } from "@nestjs/common";
+import {
+  Controller,
+  All,
+  Req,
+  Res,
+  UseGuards,
+  HttpStatus,
+  HttpException,
+} from "@nestjs/common";
 import { Request, Response } from "express";
 import { GatewayService } from "./gateway.service";
 import { JwtAuthGuard } from "../common/guards/jwt-authentication.guard";
@@ -28,10 +36,18 @@ export class GatewayController {
         "Content-Type": req.headers["content-type"],
       };
 
-      const result = await this.gatewayService.routeToApi(path, method, data, headers);
+      const result = await this.gatewayService.routeToApi(
+        path,
+        method,
+        data,
+        headers,
+      );
       return res.status(HttpStatus.OK).json(result);
     } catch (error) {
-      throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -48,10 +64,18 @@ export class GatewayController {
         "Content-Type": req.headers["content-type"],
       };
 
-      const result = await this.gatewayService.routeToKafkaProducer(path, method, data, headers);
+      const result = await this.gatewayService.routeToKafkaProducer(
+        path,
+        method,
+        data,
+        headers,
+      );
       return res.status(HttpStatus.OK).json(result);
     } catch (error) {
-      throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

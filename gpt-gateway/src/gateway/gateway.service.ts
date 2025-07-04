@@ -10,19 +10,26 @@ export class GatewayService {
   constructor(private readonly configService: ConfigService) {
     // API service client
     this.apiClient = axios.create({
-      baseURL: this.configService.get("API_SERVICE_URL") || "http://localhost:3001",
+      baseURL:
+        this.configService.get("API_SERVICE_URL") || "http://localhost:3001",
       timeout: 10000,
     });
 
     // Kafka Producer service client
     this.kafkaProducerClient = axios.create({
-      baseURL: this.configService.get("KAFKA_PRODUCER_URL") || "http://localhost:3002",
+      baseURL:
+        this.configService.get("KAFKA_PRODUCER_URL") || "http://localhost:3002",
       timeout: 10000,
     });
   }
 
   // Route to API service
-  async routeToApi(path: string, method: string, data?: any, headers?: any): Promise<any> {
+  async routeToApi(
+    path: string,
+    method: string,
+    data?: any,
+    headers?: any,
+  ): Promise<any> {
     try {
       const response: AxiosResponse = await this.apiClient.request({
         method,
@@ -32,12 +39,20 @@ export class GatewayService {
       });
       return response.data;
     } catch (error) {
-      throw new HttpException(`API Service Error: ${error.message}`, error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `API Service Error: ${error.message}`,
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // Route to Kafka Producer service
-  async routeToKafkaProducer(path: string, method: string, data?: any, headers?: any): Promise<any> {
+  async routeToKafkaProducer(
+    path: string,
+    method: string,
+    data?: any,
+    headers?: any,
+  ): Promise<any> {
     try {
       const response: AxiosResponse = await this.kafkaProducerClient.request({
         method,
@@ -47,7 +62,10 @@ export class GatewayService {
       });
       return response.data;
     } catch (error) {
-      throw new HttpException(`Kafka Producer Service Error: ${error.message}`, error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `Kafka Producer Service Error: ${error.message}`,
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

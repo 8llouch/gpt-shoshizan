@@ -28,4 +28,7 @@ async function bootstrap() {
   await app.listen(Number(process.env.PRODUCER_PORT));
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Error starting application:', error);
+  process.exit(1);
+});
