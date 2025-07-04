@@ -12,8 +12,11 @@ import {
 import { ConversationsService } from './conversations.service';
 import { ConversationEntity, JwtPayload } from '@shoshizan/shared-interfaces';
 import { JwtAuthGuard } from '../authentication/guards/jwt-authentication.guard';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ApiExcludeController } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiExcludeController,
+} from '@nestjs/swagger';
 
 @ApiExcludeController()
 @Controller('conversations')
