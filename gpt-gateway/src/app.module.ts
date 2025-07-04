@@ -9,6 +9,7 @@ import { AuthModule } from "./authentication/authentication.module";
 import { GatewayModule } from "./gateway/gateway.module";
 import { OllamaModule } from "./ollama/ollama.module";
 import { UserEntity } from "@shoshizan/shared-interfaces";
+import { CommonModule } from "./common/common.module";
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UserEntity } from "@shoshizan/shared-interfaces";
     AuthModule,
     GatewayModule,
     OllamaModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
