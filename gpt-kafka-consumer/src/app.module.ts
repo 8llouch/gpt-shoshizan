@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -31,7 +29,6 @@ import { KafkaController } from './kafka.controller';
     ConversationModule,
     MessageModule,
   ],
-  controllers: [AppController, KafkaController],
-  providers: [AppService],
+  controllers: [KafkaController],
 })
 export class AppModule {}
