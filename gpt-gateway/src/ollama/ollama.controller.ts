@@ -1,5 +1,20 @@
-import { Controller, Post, Get, Body, UseGuards, Request, Response, HttpException, HttpStatus, Logger } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  Request,
+  Response,
+  HttpStatus,
+  Logger,
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-authentication.guard";
 import { RateLimitGuard } from "../common/guards/rate-limit.guard";
 import { RateLimit } from "../common/decorators/rate-limit.decorator";
@@ -7,6 +22,10 @@ import { OllamaService } from "./ollama.service";
 import { OllamaRequestDto } from "./dto/ollama-request.dto";
 import { JwtPayload } from "@shoshizan/shared-interfaces";
 import { Response as ExpressResponse } from "express";
+
+interface ErrorWithStatus extends Error {
+  status?: number;
+}
 
 @ApiTags("OLLAMA")
 @Controller("gateway/ollama")
@@ -30,23 +49,31 @@ export class OllamaController {
   async generateResponse(
     @Body() request: OllamaRequestDto,
     @Request() req: { user: JwtPayload },
-    @Response() response: ExpressResponse
+    @Response() response: ExpressResponse,
   ): Promise<void> {
     const userId = req.user.sub;
 
     try {
-      this.logger.log(`Processing OLLAMA request for user ${userId}, model: ${request.model}`);
+      this.logger.log(
+        `Processing OLLAMA request for user ${userId}, model: ${request.model}`,
+      );
 
       // Delegate to service
       await this.ollamaService.generateResponse(request, userId, response);
     } catch (error) {
-      this.logger.error(`Error in OLLAMA controller: ${error.message}`, error.stack);
+      const errorWithStatus = error as ErrorWithStatus;
+      this.logger.error(
+        `Error in OLLAMA controller: ${errorWithStatus.message}`,
+        errorWithStatus.stack,
+      );
 
       if (!response.headersSent) {
-        response.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR);
+        const statusCode =
+          errorWithStatus.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        response.status(statusCode);
         response.json({
-          error: error.message || "Internal server error",
-          statusCode: error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: errorWithStatus.message || "Internal server error",
+          statusCode: statusCode,
         });
       }
     }
@@ -62,7 +89,7 @@ export class OllamaController {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 60, // 60 model requests per minute per user
   })
-  async getModels(@Request() req: { user: JwtPayload }) {
+  async getModels(@Request() req: { user: JwtPayload }): Promise<unknown> {
     const userId = req.user.sub;
     this.logger.log(`Fetching models for user ${userId}`);
 

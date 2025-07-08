@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsBoolean, IsArray, IsObject, IsNumber } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  IsNumber,
+} from "class-validator";
 import { Type } from "class-transformer";
 
 export class OllamaOptionsDto {

@@ -3,18 +3,29 @@ import { ConfigService } from "@nestjs/config";
 import { OllamaRequestDto } from "./dto/ollama-request.dto";
 import { Response } from "express";
 
+interface ErrorWithMessage extends Error {
+  message: string;
+}
+
 @Injectable()
 export class OllamaService {
   private readonly logger = new Logger(OllamaService.name);
   private readonly ollamaUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.ollamaUrl = this.configService.get("OLLAMA_URL") || "http://localhost:11434";
+    this.ollamaUrl =
+      this.configService.get("OLLAMA_URL") || "http://localhost:11434";
   }
 
-  async generateResponse(request: OllamaRequestDto, userId: string, response: Response): Promise<void> {
+  async generateResponse(
+    request: OllamaRequestDto,
+    userId: string,
+    response: Response,
+  ): Promise<void> {
     try {
-      this.logger.log(`Processing OLLAMA request for user ${userId}, model: ${request.model}`);
+      this.logger.log(
+        `Processing OLLAMA request for user ${userId}, model: ${request.model}`,
+      );
 
       // Prepare the request payload for OLLAMA
       const ollamaPayload = {
@@ -38,13 +49,21 @@ export class OllamaService {
       });
 
       if (!ollamaResponse.ok) {
-        this.logger.error(`OLLAMA server error: ${ollamaResponse.status} ${ollamaResponse.statusText}`);
-        throw new HttpException(`OLLAMA server error: ${ollamaResponse.statusText}`, HttpStatus.BAD_GATEWAY);
+        this.logger.error(
+          `OLLAMA server error: ${ollamaResponse.status} ${ollamaResponse.statusText}`,
+        );
+        throw new HttpException(
+          `OLLAMA server error: ${ollamaResponse.statusText}`,
+          HttpStatus.BAD_GATEWAY,
+        );
       }
 
       if (!ollamaResponse.body) {
         this.logger.error("No response body from OLLAMA server");
-        throw new HttpException("No response body from OLLAMA server", HttpStatus.BAD_GATEWAY);
+        throw new HttpException(
+          "No response body from OLLAMA server",
+          HttpStatus.BAD_GATEWAY,
+        );
       }
 
       // Set headers for streaming response
@@ -70,7 +89,7 @@ export class OllamaService {
               // Validate JSON before sending
               JSON.parse(line);
               response.write(line + "\n");
-            } catch (parseError) {
+            } catch {
               this.logger.warn(`Invalid JSON chunk from OLLAMA: ${line}`);
             }
           }
@@ -82,26 +101,40 @@ export class OllamaService {
       response.end();
       this.logger.log(`OLLAMA request completed for user ${userId}`);
     } catch (error) {
-      this.logger.error(`Error processing OLLAMA request: ${error.message}`, error.stack);
+      const errorWithMessage = error as ErrorWithMessage;
+      this.logger.error(
+        `Error processing OLLAMA request: ${errorWithMessage.message}`,
+        errorWithMessage.stack,
+      );
 
       if (!response.headersSent) {
-        throw new HttpException("Failed to process OLLAMA request", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          "Failed to process OLLAMA request",
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
 
-  async getModels(): Promise<any> {
+  async getModels(): Promise<unknown> {
     try {
       const response = await fetch(`${this.ollamaUrl}/api/tags`);
 
       if (!response.ok) {
-        throw new HttpException(`Failed to fetch models: ${response.statusText}`, HttpStatus.BAD_GATEWAY);
+        throw new HttpException(
+          `Failed to fetch models: ${response.statusText}`,
+          HttpStatus.BAD_GATEWAY,
+        );
       }
 
       return await response.json();
     } catch (error) {
-      this.logger.error(`Error fetching models: ${error.message}`);
-      throw new HttpException("Failed to fetch available models", HttpStatus.INTERNAL_SERVER_ERROR);
+      const errorWithMessage = error as ErrorWithMessage;
+      this.logger.error(`Error fetching models: ${errorWithMessage.message}`);
+      throw new HttpException(
+        "Failed to fetch available models",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -118,7 +151,10 @@ export class OllamaService {
       clearTimeout(timeoutId);
       return response.ok;
     } catch (error) {
-      this.logger.warn(`OLLAMA health check failed: ${error.message}`);
+      const errorWithMessage = error as ErrorWithMessage;
+      this.logger.warn(
+        `OLLAMA health check failed: ${errorWithMessage.message}`,
+      );
       return false;
     }
   }
