@@ -9,7 +9,7 @@ vi.mock('@/stores/authStore', () => ({
 describe('ConversationsService', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    global.fetch = vi.fn()
+    global.fetch = vi.fn() as ReturnType<typeof vi.fn>
     vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.spyOn(console, 'log').mockImplementation(() => {})
   })
@@ -18,7 +18,8 @@ describe('ConversationsService', () => {
   })
 
   it('generateConversationId success', async () => {
-    ;(fetch as any).mockResolvedValue({
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ conversationId: 'abc' }),
     })
@@ -27,7 +28,8 @@ describe('ConversationsService', () => {
   })
 
   it('generateConversationId error', async () => {
-    ;(fetch as any).mockResolvedValue({ ok: false, statusText: 'fail' })
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
     await expect(ConversationsService.generateConversationId()).rejects.toThrow(
       'Failed to generate conversation ID: fail',
     )
@@ -35,7 +37,8 @@ describe('ConversationsService', () => {
 
   it('getConversations success', async () => {
     const conversations = [{ id: '1' }]
-    ;(fetch as any).mockResolvedValue({
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(conversations),
     })
@@ -44,19 +47,22 @@ describe('ConversationsService', () => {
   })
 
   it('getConversations error', async () => {
-    ;(fetch as any).mockResolvedValue({ ok: false, statusText: 'fail' })
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
     await expect(ConversationsService.getConversations()).rejects.toThrow(
       'Failed to fetch conversations: fail',
     )
   })
 
   it('deleteConversation success', async () => {
-    ;(fetch as any).mockResolvedValue({ ok: true })
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({ ok: true })
     await expect(ConversationsService.deleteConversation('1')).resolves.toBeUndefined()
   })
 
   it('deleteConversation error', async () => {
-    ;(fetch as any).mockResolvedValue({ ok: false, statusText: 'fail' })
+    const mockFetch = fetch as ReturnType<typeof vi.fn>
+    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
     await expect(ConversationsService.deleteConversation('1')).rejects.toThrow(
       'Failed to delete conversation: fail',
     )

@@ -2,22 +2,19 @@ import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useConversationsStore } from './conversationsStore'
 
-vi.mock('../services/conversationsService', () => {
-  const mockGetConversations = vi.fn().mockResolvedValue([
-    { id: '1', messages: [], updatedAt: new Date(), createdAt: new Date(), context: [42] },
-    { id: '2', messages: [], updatedAt: new Date(), createdAt: new Date(), context: null },
-  ])
-  const mockDeleteConversation = vi.fn().mockImplementation(async (_id) => undefined)
-  return {
-    ConversationsService: {
-      generateConversationId: vi.fn().mockResolvedValue('id'),
-      getConversations: mockGetConversations,
-      deleteConversation: mockDeleteConversation,
-      __mockGetConversations: mockGetConversations,
-      __mockDeleteConversation: mockDeleteConversation,
-    },
-  }
-})
+const mockGetConversations = vi.fn().mockResolvedValue([
+  { id: '1', messages: [], updatedAt: new Date(), createdAt: new Date(), context: [42] },
+  { id: '2', messages: [], updatedAt: new Date(), createdAt: new Date(), context: null },
+])
+const mockDeleteConversation = vi.fn().mockImplementation(async () => undefined)
+
+vi.mock('../services/conversationsService', () => ({
+  ConversationsService: {
+    generateConversationId: vi.fn().mockResolvedValue('id'),
+    getConversations: mockGetConversations,
+    deleteConversation: mockDeleteConversation,
+  },
+}))
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -45,8 +42,7 @@ describe('conversationsStore', () => {
   })
 
   it('loadConversations handles error', async () => {
-    const { ConversationsService } = await import('../services/conversationsService')
-    ConversationsService.__mockGetConversations.mockRejectedValueOnce(new Error('fail'))
+    mockGetConversations.mockRejectedValueOnce(new Error('fail'))
     const store = useConversationsStore()
     await store.loadConversations()
     expect(store.error).toBe('fail')
@@ -95,8 +91,7 @@ describe('conversationsStore', () => {
   })
 
   it('deleteConversation handles error', async () => {
-    const { ConversationsService } = await import('../services/conversationsService')
-    ConversationsService.__mockDeleteConversation.mockRejectedValueOnce(new Error('fail'))
+    mockDeleteConversation.mockRejectedValueOnce(new Error('fail'))
     const store = useConversationsStore()
     await store.loadConversations()
     await expect(store.deleteConversation('1')).rejects.toThrow('fail')

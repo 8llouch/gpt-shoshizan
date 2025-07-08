@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { ApiService } from './apiService'
+import type { ApiRequest } from '@shoshizan/shared-interfaces'
 
-const globalAny: any = globalThis
+const globalAny = globalThis as typeof globalThis & { fetch: ReturnType<typeof vi.fn> }
 
 vi.mock('../stores/authStore', () => ({
   useAuthStore: () => ({ getAuthHeaders: () => ({ Authorization: 'Bearer token' }) }),
@@ -16,20 +17,22 @@ describe('ApiService', () => {
   })
 
   it('should throw if conversationId is missing', async () => {
-    await expect(ApiService.sendRequest({} as any)).rejects.toThrow('conversationId is required')
+    await expect(ApiService.sendRequest({} as ApiRequest)).rejects.toThrow(
+      'conversationId is required',
+    )
   })
 
   it('should throw if fetch fails', async () => {
     globalAny.fetch.mockResolvedValue({ ok: false, statusText: 'Error', body: {} })
     await expect(
-      ApiService.sendRequest({ conversationId: '1', model: 'test', prompt: 'hi' } as any),
+      ApiService.sendRequest({ conversationId: '1', model: 'test', prompt: 'hi' } as ApiRequest),
     ).rejects.toThrow('Failed to get response from Ollama: Error')
   })
 
   it('should throw if no response body', async () => {
     globalAny.fetch.mockResolvedValue({ ok: true, body: null })
     await expect(
-      ApiService.sendRequest({ conversationId: '1', model: 'test', prompt: 'hi' } as any),
+      ApiService.sendRequest({ conversationId: '1', model: 'test', prompt: 'hi' } as ApiRequest),
     ).rejects.toThrow('No response body from Ollama')
   })
 
@@ -58,7 +61,7 @@ describe('ApiService', () => {
       system: '',
       options: {},
     }
-    const res = await ApiService.sendRequest(req as any, onChunk)
+    const res = await ApiService.sendRequest(req as ApiRequest, onChunk)
     expect(res.response).toBe('ab')
     expect(res.done).toBe(true)
     expect(res.context).toEqual([1, 2])
@@ -86,7 +89,7 @@ describe('ApiService', () => {
       conversationId: '1',
       model: 'm',
       prompt: 'p',
-    } as any)
+    } as ApiRequest)
     expect(res.response).toBe('ok')
     expect(res.done).toBe(true)
     consoleError.mockRestore()

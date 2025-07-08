@@ -21,14 +21,16 @@ describe('apiStore', () => {
   it('sendMessage handles error', async () => {
     const store = useApiStore()
     const error = new Error('fail')
-    ;(ApiService.sendRequest as any).mockRejectedValue(error)
+    const mockSendRequest = ApiService.sendRequest as ReturnType<typeof vi.fn>
+    mockSendRequest.mockRejectedValue(error)
     await expect(store.sendMessage('msg', 'id')).rejects.toThrow('fail')
     expect(store.error).toBe('fail')
   })
 
   it('sendMessage updates isLoading', async () => {
     const store = useApiStore()
-    ;(ApiService.sendRequest as any).mockResolvedValue({ data: 'ok' })
+    const mockSendRequest = ApiService.sendRequest as ReturnType<typeof vi.fn>
+    mockSendRequest.mockResolvedValue({ data: 'ok' })
     const promise = store.sendMessage('msg', 'id')
     expect(store.isLoading).toBe(true)
     await promise

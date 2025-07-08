@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { createRouter, createWebHistory } from 'vue-router'
-import { createI18n } from 'vue-i18n'
+import { createRouter, createWebHistory, type Router } from 'vue-router'
+import { createI18n, type I18n } from 'vue-i18n'
 import App from './App.vue'
 
 vi.mock('./components/base/ThemeProvider.vue', () => ({
@@ -20,8 +20,8 @@ vi.mock('./components/base/ThemeSwitcher.vue', () => ({
 }))
 
 describe('App.vue', () => {
-  let router: any
-  let i18n: any
+  let router: Router
+  let i18n: I18n
 
   beforeEach(() => {
     setActivePinia(createPinia())
