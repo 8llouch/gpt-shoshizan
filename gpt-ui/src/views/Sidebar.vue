@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, defineOptions } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useConversationsStore } from '../stores/conversationsStore'
 import { useAuthStore } from '../stores/authStore'
+
+defineOptions({
+  name: 'SidebarView',
+})
 
 interface Props {
   isOpen?: boolean
@@ -30,10 +34,6 @@ const conversations = computed(() =>
     createdAt: conv.createdAt,
   })),
 )
-
-const toggleSidebar = () => {
-  emit('toggle')
-}
 
 const startNewConversation = () => {
   conversationsStore.createConversation()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useConversationsStore } from '../stores/conversationsStore'
 import { useApiStore } from '../stores/apiStore'
 import GptLayout from './GptLayout.vue'

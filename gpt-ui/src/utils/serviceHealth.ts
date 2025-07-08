@@ -32,7 +32,7 @@ export class ServiceHealthChecker {
 
         console.log(`⏳ Waiting for services... (attempt ${attempt}/${this.MAX_RETRIES})`)
         await this.delay(this.RETRY_INTERVAL)
-      } catch (error) {
+      } catch {
         console.log(`⏳ Services not ready yet... (attempt ${attempt}/${this.MAX_RETRIES})`)
         await this.delay(this.RETRY_INTERVAL)
       }
@@ -68,7 +68,7 @@ export class ServiceHealthChecker {
       })
 
       return response.ok
-    } catch (error) {
+    } catch {
       return false
     }
   }
