@@ -1,4 +1,6 @@
 import { RateLimitOptions } from "../decorators/rate-limit.decorator";
+import { Request } from "express";
+
 /**
  * This is the rate limit configuration for the gateway.
  * It is used to limit the number of requests to the gateway.
@@ -14,13 +16,13 @@ export const RATE_LIMIT_CONFIG = {
     LOGIN: {
       windowMs: 15 * 60 * 1000,
       maxRequests: 10,
-      keyGenerator: (req: any) => req.ip || "unknown",
+      keyGenerator: (req: Request) => req.ip || "unknown",
     } as RateLimitOptions,
 
     REGISTER: {
       windowMs: 15 * 60 * 1000,
       maxRequests: 5,
-      keyGenerator: (req: any) => req.ip || "unknown",
+      keyGenerator: (req: Request) => req.ip || "unknown",
     } as RateLimitOptions,
 
     PROFILE: {
@@ -60,7 +62,7 @@ export const RATE_LIMIT_CONFIG = {
     HEALTH: {
       windowMs: 60 * 1000,
       maxRequests: 60,
-      keyGenerator: (req: any) => req.ip || "unknown",
+      keyGenerator: (req: Request) => req.ip || "unknown",
     } as RateLimitOptions,
   },
 

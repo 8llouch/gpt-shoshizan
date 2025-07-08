@@ -19,7 +19,9 @@ async function bootstrap() {
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle("GPT-SHOSHIZAN Gateway API")
-    .setDescription("Gateway service for centralized routing and authentication")
+    .setDescription(
+      "Gateway service for centralized routing and authentication",
+    )
     .setVersion("1.0")
     .addTag("Authentication")
     .addTag("Gateway")
