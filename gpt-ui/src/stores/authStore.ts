@@ -5,11 +5,9 @@ import { useConversationsStore } from './conversationsStore'
 import { useApiStore } from './apiStore'
 import { useModelStore } from './modelStore'
 import { useThemeStore } from './themeStore'
-import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('authToken'))
-  const user = ref<any>(null)
   const isLoading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
@@ -37,7 +35,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = () => {
     token.value = null
-    user.value = null
     localStorage.removeItem('authToken')
     cleanAllStores()
   }
@@ -65,7 +62,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     token,
-    user,
     isLoading,
     isAuthenticated,
     login,

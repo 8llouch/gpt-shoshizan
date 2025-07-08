@@ -9,6 +9,7 @@ import type {
   MessageEntity,
   Message,
   ModelOptions,
+  UserEntity,
 } from '@shoshizan/shared-interfaces'
 
 export const useConversationsStore = defineStore('conversationsStore', () => {
@@ -80,10 +81,10 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
 
   const createConversation = async (): Promise<ConversationEntity> => {
     const id = await ConversationsService.generateConversationId()
-    const newConversation: ConversationEntity = {
+    const newConversation = {
       id,
-      userId: undefined as any,
-      user: undefined as any,
+      userId: null as string | null,
+      user: null as UserEntity | null,
       createdAt: new Date(),
       updatedAt: new Date(),
       systemPrompt: '',
@@ -92,7 +93,7 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       modelOptions: {} as ModelOptions,
       apiMetrics: {},
       context: null,
-    }
+    } as ConversationEntity
 
     conversations.value.unshift(newConversation)
     currentConversationId.value = newConversation.id
