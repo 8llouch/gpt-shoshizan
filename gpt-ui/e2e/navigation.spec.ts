@@ -27,7 +27,7 @@ test.describe('Navigation and Routing', () => {
       try {
         localStorage.clear()
         sessionStorage.clear()
-      } catch (e) {
+      } catch {
         // Ignore security errors in some browsers
       }
     })
@@ -47,7 +47,7 @@ test.describe('Navigation and Routing', () => {
       try {
         localStorage.clear()
         sessionStorage.clear()
-      } catch (e) {
+      } catch {
         // Ignore security errors in some browsers
       }
     })

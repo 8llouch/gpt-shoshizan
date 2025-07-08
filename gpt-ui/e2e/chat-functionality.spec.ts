@@ -72,14 +72,14 @@ test.describe('Chat Functionality', () => {
   test('should show correct send button states', async ({ page }) => {
     // Initially should show send icon
     await expect(page.getByTestId('send-icon')).toBeVisible()
-    await expect(page.getByTestId('loading-icon')).not.toBeVisible()
+    await expect(page.getByTestId('loading-icon')).toBeHidden()
 
     // After sending message, should show loading icon
     await page.getByTestId('message-input').fill('Test message')
     await page.getByTestId('send-button').click()
 
     await expect(page.getByTestId('loading-icon')).toBeVisible()
-    await expect(page.getByTestId('send-icon')).not.toBeVisible()
+    await expect(page.getByTestId('send-icon')).toBeHidden()
   })
 
   test('should handle markdown rendering in messages', async ({ page }) => {

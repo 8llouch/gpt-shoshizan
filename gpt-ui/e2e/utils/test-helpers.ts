@@ -3,6 +3,10 @@ import { Page, expect } from '@playwright/test'
 export class TestHelpers {
   constructor(private page: Page) {}
 
+  get testPage(): Page {
+    return this.page
+  }
+
   /**
    * Login to the application with default test credentials
    */

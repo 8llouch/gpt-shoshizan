@@ -8,9 +8,9 @@ test.describe('Integration Tests', () => {
     helpers = new TestHelpers(page)
   })
 
-  test('basic login and chat functionality', async ({ page }) => {
+  test('basic login and chat functionality', async () => {
     await helpers.login()
-    await expect(page.getByTestId('chat-layout')).toBeVisible()
+    await expect(helpers.testPage.getByTestId('chat-layout')).toBeVisible()
 
     // Send a simple message
     await helpers.sendMessage('Hello, this is a test message')
@@ -20,8 +20,8 @@ test.describe('Integration Tests', () => {
     await helpers.waitForMessage('Hello, this is a test message')
   })
 
-  test('new conversation creation', async ({ page }) => {
-    await page.setViewportSize({ width: 1024, height: 768 })
+  test('new conversation creation', async () => {
+    await helpers.setViewport('desktop')
     await helpers.login()
 
     // Create a new conversation
@@ -32,7 +32,7 @@ test.describe('Integration Tests', () => {
     expect(conversationCount).toBeGreaterThan(0)
   })
 
-  test('theme switching', async ({ page }) => {
+  test('theme switching', async () => {
     await helpers.login()
 
     // Toggle theme
@@ -44,20 +44,20 @@ test.describe('Integration Tests', () => {
     expect(await helpers.getCurrentTheme()).toBe('light')
   })
 
-  test('model selection', async ({ page }) => {
+  test('model selection', async () => {
     await helpers.login()
 
     // Test model selection
     await helpers.changeModel('llama3.2')
-    await expect(page.getByTestId('model-select')).toHaveValue('llama3.2')
+    await expect(helpers.testPage.getByTestId('model-select')).toHaveValue('llama3.2')
   })
 
-  test('logout functionality', async ({ page }) => {
+  test('logout functionality', async () => {
     await helpers.login()
-    await expect(page.getByTestId('chat-layout')).toBeVisible()
+    await expect(helpers.testPage.getByTestId('chat-layout')).toBeVisible()
 
     // Logout
     await helpers.logout()
-    await expect(page.getByTestId('login-form')).toBeVisible()
+    await expect(helpers.testPage.getByTestId('login-form')).toBeVisible()
   })
 })

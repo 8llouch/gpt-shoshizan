@@ -15,17 +15,17 @@ test.describe('Authentication Component', () => {
   test('should toggle between login and register forms', async ({ page }) => {
     // Initially should show login form
     await expect(page.getByTestId('login-form')).toBeVisible()
-    await expect(page.getByTestId('register-form')).not.toBeVisible()
+    await expect(page.getByTestId('register-form')).toBeHidden()
 
     // Click toggle button to show register form
     await page.getByTestId('toggle-auth-mode').click()
     await expect(page.getByTestId('register-form')).toBeVisible()
-    await expect(page.getByTestId('login-form')).not.toBeVisible()
+    await expect(page.getByTestId('login-form')).toBeHidden()
 
     // Click toggle button again to show login form
     await page.getByTestId('toggle-auth-mode').click()
     await expect(page.getByTestId('login-form')).toBeVisible()
-    await expect(page.getByTestId('register-form')).not.toBeVisible()
+    await expect(page.getByTestId('register-form')).toBeHidden()
   })
 
   test('should handle successful login', async ({ page }) => {
