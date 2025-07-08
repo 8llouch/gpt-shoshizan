@@ -22,6 +22,13 @@ interface RequestWithUser extends Request {
   user?: { sub: string };
 }
 
+interface RequestWithConnection {
+  ip?: string;
+  socket?: { remoteAddress?: string };
+  connection?: { remoteAddress?: string };
+  user?: { sub: string };
+}
+
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RateLimitGuard.name);
@@ -90,8 +97,13 @@ export class RateLimitGuard implements CanActivate {
       return options.keyGenerator(request);
     }
 
-    const ip = request.ip || request.socket?.remoteAddress || "unknown";
-    const userId = request.user?.sub || "anonymous";
+    const requestWithConnection = request as RequestWithConnection;
+    const ip =
+      requestWithConnection.ip ||
+      requestWithConnection.socket?.remoteAddress ||
+      requestWithConnection.connection?.remoteAddress ||
+      "unknown";
+    const userId = requestWithConnection.user?.sub || "anonymous";
     return `${ip}:${userId}`;
   }
 
