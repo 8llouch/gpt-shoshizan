@@ -185,7 +185,7 @@ describe('KafkaController', () => {
       );
     });
 
-    it('should handle non-existent conversation', async () => {
+    it('should handle non-existent conversation by creating one', async () => {
       const mockData: LlmResponseMessage = {
         conversationId: '1',
         response: 'This is my response',
@@ -193,12 +193,64 @@ describe('KafkaController', () => {
         timestamp: Date.now().toString(),
       };
 
+      const mockConversation: ConversationEntity = {
+        id: '1',
+        userId: '',
+        user: {
+          id: '1',
+          email: 'test@test.com',
+          name: 'Test User',
+          password: '123456',
+          role: 'user',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        systemPrompt: '',
+        modelOptions: { temperature: 0.7, num_predict: 100 },
+        messages: [],
+        responses: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        apiMetrics: {
+          total_duration: 0,
+          load_duration: 0,
+          prompt_eval_duration: 0,
+          eval_duration: 0,
+          eval_count: 0,
+        },
+        context: null,
+      };
+
+      const mockMessage: MessageEntity = {
+        id: '1',
+        content: 'This is my response',
+        role: 'assistant',
+        timestamp: Date.now().toString(),
+        conversation: mockConversation,
+        createdAt: new Date(),
+      };
+
       conversationService.getConversation.mockResolvedValue(null);
+      conversationService.createConversation.mockResolvedValue(
+        mockConversation,
+      );
+      conversationService.addMessage.mockResolvedValue(mockMessage);
 
       const result = await controller.handleOutputCreated(mockData);
 
-      expect(result).toEqual({ received: false, message: mockData });
-      expect(conversationService.addMessage).not.toHaveBeenCalled();
+      expect(result).toEqual({ received: true, message: mockData });
+      expect(conversationService.createConversation).toHaveBeenCalledWith(
+        mockData.conversationId,
+        undefined,
+        undefined,
+        undefined,
+      );
+      expect(conversationService.addMessage).toHaveBeenCalledWith(
+        mockData.conversationId,
+        mockData.response,
+        'assistant',
+        mockData.model,
+      );
     });
 
     it('should handle errors when processing output message', async () => {
@@ -215,6 +267,30 @@ describe('KafkaController', () => {
 
       await expect(controller.handleOutputCreated(mockData)).rejects.toThrow(
         'Test error',
+      );
+    });
+
+    it('should handle errors when creating conversation for AI response', async () => {
+      const mockData: LlmResponseMessage = {
+        conversationId: '1',
+        response: 'This is my response',
+        model: 'gpt-666',
+        timestamp: Date.now().toString(),
+      };
+
+      conversationService.getConversation.mockResolvedValue(null);
+      conversationService.createConversation.mockRejectedValue(
+        new Error('Failed to create conversation'),
+      );
+
+      await expect(controller.handleOutputCreated(mockData)).rejects.toThrow(
+        'Failed to create conversation',
+      );
+      expect(conversationService.createConversation).toHaveBeenCalledWith(
+        mockData.conversationId,
+        undefined,
+        undefined,
+        undefined,
       );
     });
   });

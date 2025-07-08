@@ -22,6 +22,7 @@ describe('KafkaProducerController', () => {
 
   const mockKafkaProducerService = {
     produceMessage: jest.fn().mockResolvedValue(undefined),
+    produceResponseMessage: jest.fn().mockResolvedValue(undefined),
   };
 
   const mockJwtService = {
@@ -86,35 +87,32 @@ describe('KafkaProducerController', () => {
           conversationId: mockInput.conversationId,
           options: mockInput.options,
           userId: mockRequest.user.sub,
-          timestamp: expect.any(String),
+          timestamp: expect.any(String) as string,
         }),
       );
     });
   });
 
-  describe('sendAiOutput', () => {
-    it('should call produceMessage with correct topic and message format', async () => {
-      const mockOutput: LlmRequestMessageDto = {
+  describe('sendAiResponse', () => {
+    it('should call produceResponseMessage with correct topic and message format', async () => {
+      const mockOutput = {
         model: 'gpt-4',
-        prompt: 'AI response',
+        response: 'AI response',
         conversationId: 'conv123',
-        options: {
-          temperature: 0.7,
-          num_predict: 100,
-        },
+        timestamp: new Date().toISOString(),
       };
 
-      await controller.sendAiOutput(mockOutput, mockRequest);
+      await controller.sendAiResponse(mockOutput, mockRequest);
 
-      expect(mockKafkaProducerService.produceMessage).toHaveBeenCalledWith(
+      expect(
+        mockKafkaProducerService.produceResponseMessage,
+      ).toHaveBeenCalledWith(
         'output.created',
         expect.objectContaining({
           model: mockOutput.model,
-          prompt: mockOutput.prompt,
+          response: mockOutput.response,
           conversationId: mockOutput.conversationId,
-          options: mockOutput.options,
-          userId: mockRequest.user.sub,
-          timestamp: expect.any(String),
+          timestamp: expect.any(String) as string,
         }),
       );
     });
