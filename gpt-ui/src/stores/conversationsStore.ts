@@ -72,6 +72,11 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
 
       conversations.value = processedConversations
     } catch (err) {
+      if (err instanceof Error && err.message === 'Authentication required') {
+        console.log('Authentication required for loading conversations')
+        return
+      }
+
       error.value = err instanceof Error ? err.message : 'Failed to load conversations'
       console.error('Error loading conversations:', err)
     } finally {
@@ -182,6 +187,12 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       }
     } catch (error) {
       console.error('Error sending message:', error)
+
+      if (error instanceof Error && error.message === 'Authentication required') {
+        console.log('Authentication required for sending message')
+        return
+      }
+
       addMessage(
         conversation.id,
         'Désolé, une erreur est survenue. Veuillez réessayer.',
@@ -240,6 +251,12 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       }
     } catch (error) {
       console.error('Error regenerating response:', error)
+
+      if (error instanceof Error && error.message === 'Authentication required') {
+        console.log('Authentication required for regenerating response')
+        return
+      }
+
       addMessage(
         conversation.id,
         'Désolé, une erreur est survenue lors de la régénération.',
@@ -277,6 +294,10 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       }
     } catch (error) {
       console.error('Failed to delete conversation:', error)
+      if (error instanceof Error && error.message === 'Authentication required') {
+        console.log('Authentication required for deleting conversation')
+        return
+      }
       throw error
     }
   }
@@ -288,12 +309,24 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       return
     }
 
+    const isValidToken = await authStore.validateToken()
+    if (!isValidToken) {
+      return
+    }
+
     if (conversations.value.length === 0) {
       await loadConversations()
     }
 
     if (conversations.value.length === 0) {
-      await createConversation()
+      try {
+        await createConversation()
+      } catch (err) {
+        if (err instanceof Error && err.message === 'Authentication required') {
+          return
+        }
+        console.error('Failed to create conversation:', err)
+      }
     } else if (!currentConversationId.value) {
       currentConversationId.value = conversations.value[0].id
       // Restore context for the first conversation
