@@ -63,9 +63,8 @@ const deleteConversation = async (conversationId: string, event: Event) => {
   }
 }
 
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/auth')
+const handleLogout = async () => {
+  await authStore.logout()
 }
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
