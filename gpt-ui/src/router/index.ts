@@ -21,13 +21,28 @@ const router = createRouter({
 })
 
 // Navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/auth')
+  if (to.meta.requiresAuth) {
+    if (!authStore.isAuthenticated) {
+      next('/auth')
+      return
+    }
+
+    const isValidToken = await authStore.validateToken()
+    if (!isValidToken) {
+      return
+    }
+
+    next()
   } else if (to.path === '/auth' && authStore.isAuthenticated) {
-    next('/chat')
+    const isValidToken = await authStore.validateToken()
+    if (isValidToken) {
+      next('/chat')
+    } else {
+      next()
+    }
   } else {
     next()
   }

@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import router from '../router'
 import { AuthenticationService } from '../services/authenticationService'
 import { useConversationsStore } from './conversationsStore'
 import { useApiStore } from './apiStore'
 import { useModelStore } from './modelStore'
 import { useThemeStore } from './themeStore'
+import { API_CONFIG } from '../constants'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('authToken'))
@@ -33,10 +35,47 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = () => {
+  const validateToken = async (): Promise<boolean> => {
+    if (!token.value) {
+      return false
+    }
+
+    try {
+      const response = await fetch(`${API_CONFIG.AUTH_BASE_URL}/auth/profile`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          await handleTokenExpiration()
+        }
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error validating token:', error)
+      return false
+    }
+  }
+
+  const handleTokenExpiration = async () => {
+    console.log('Token expired, logging out user')
     token.value = null
     localStorage.removeItem('authToken')
     cleanAllStores()
+    router.push('/auth')
+  }
+
+  const logout = async () => {
+    token.value = null
+    localStorage.removeItem('authToken')
+    cleanAllStores()
+    router.push('/auth')
   }
 
   const cleanAllStores = () => {
@@ -67,6 +106,8 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    validateToken,
+    handleTokenExpiration,
     getAuthHeaders,
     cleanAllStores,
   }
