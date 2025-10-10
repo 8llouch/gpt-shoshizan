@@ -31,10 +31,13 @@ beforeEach(() => {
   })()
   global.localStorage = localStorageMock
   originalSetTimeout = global.setTimeout
-  global.setTimeout = (fn: any) => {
+  const mockSetTimeout = ((fn: any) => {
     fn()
     return 0
-  }
+  }) as typeof setTimeout
+  // Add __promisify__ property to satisfy Node.js typings
+  ;(mockSetTimeout as any).__promisify__ = () => Promise.resolve()
+  global.setTimeout = mockSetTimeout
 })
 
 afterEach(() => {

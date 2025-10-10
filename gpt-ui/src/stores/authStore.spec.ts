@@ -29,10 +29,8 @@ describe('authStore', () => {
   })
 
   it('login sets token', async () => {
-    const store = useAuthStore();
-    (
-      AuthenticationService.login as any,
-    ).mockResolvedValue('tok')
+    const store = useAuthStore()
+    ;(AuthenticationService.login as any).mockResolvedValue('tok')
     await store.login('a', 'b')
     expect(store.token).toBe('tok')
   })
