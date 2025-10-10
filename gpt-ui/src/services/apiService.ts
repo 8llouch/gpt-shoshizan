@@ -3,6 +3,8 @@ import { useAuthStore } from '../stores/authStore'
 import { API_CONFIG } from '../constants'
 import { ApiErrorHandler } from '../utils/apiErrorHandler'
 
+const DEV_TOKEN = import.meta.env.VITE_DEV_BEARER_TOKEN
+
 export class ApiService {
   private static readonly LLM_API_URL = API_CONFIG.LLM_API_URL
   private static readonly KAFKA_PRODUCER_URL_INPUTS = API_CONFIG.KAFKA_PRODUCER_URL_INPUTS
@@ -124,5 +126,27 @@ export class ApiService {
 
       throw error
     }
+  }
+}
+
+export async function apiFetch(input: string, init: RequestInit = {}) {
+  const base = import.meta.env.VITE_API_BASE_URL
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(DEV_TOKEN ? { Authorization: `Bearer ${DEV_TOKEN}` } : {}),
+    ...(init.headers || {}),
+  }
+  const res = await fetch(`${base}${input}`, { ...init, headers })
+
+  if (!res.ok) {
+    const errorBody = await res.text()
+    throw new Error(`HTTP error! status: ${res.status}, body: ${errorBody}`)
+  }
+
+  const contentType = res.headers.get('Content-Type')
+  if (contentType && contentType.includes('application/json')) {
+    return res.json()
+  } else {
+    return res.text()
   }
 }
