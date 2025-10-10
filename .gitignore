@@ -1,2 +1,9 @@
 node_modules
 package-lock.json
+
+# Secrets
+.env.secrets
+secrets/
+*.secret
+*.key
+.env

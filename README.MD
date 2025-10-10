@@ -121,7 +121,11 @@ cd ../gpt-api
 npm install
 ```
 
-3. Configure environment variables for each service (see individual service READMEs)
+3. Configure environment variables:
+
+- Copy `.env` if you need to override defaults or adapt hostnames. The provided values are safe to commit and describe the local Docker topology.
+- Create a `.env.secrets` file (never commit it) and add the required secrets: `POSTGRES_PASSWORD`, `DB_PASSWORD`, `JWT_SECRET`, and optionally `VITE_DEV_BEARER_TOKEN` for the UI auto-login shortcut.
+- All Docker services load these files automatically via the compose file, so updating the key/value pairs is enough—no need to edit the YAML.
 
 4. Start the services:
 
