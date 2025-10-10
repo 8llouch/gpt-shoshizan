@@ -11,8 +11,6 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'DELETE'],
   });
 
-  console.log('API_PORT from process.env:', process.env.API_PORT);
-
   await app.listen(port);
 }
 bootstrap().catch((error) => {

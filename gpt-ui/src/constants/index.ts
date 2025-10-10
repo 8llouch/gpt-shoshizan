@@ -104,7 +104,7 @@ export const MODEL_OPTIONS = [
   { text: 'llama3.2', value: 'llama3.2' },
   { text: 'gemma3', value: 'gemma3:4b' },
   { text: 'llava', value: 'llava' },
-  { text: 'deepseek', value: 'deepseek-r1' },
+  { text: 'deepseek', value: 'deepseek-r1:latest' },
   { text: 'claude', value: 'incept5/llama3.1-claude:latest' },
 ] as const
 

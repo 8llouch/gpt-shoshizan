@@ -14,7 +14,7 @@ export class OllamaService {
 
   constructor(private readonly configService: ConfigService) {
     this.ollamaUrl =
-      this.configService.get("OLLAMA_URL") || "http://localhost:11434";
+      this.configService.get("OLLAMA_BASE_URL") || "http://localhost:11434";
   }
 
   async generateResponse(
@@ -36,17 +36,28 @@ export class OllamaService {
         system: request.system,
         template: request.template,
         images: request.images,
-        options: request.options,
+        options: { num_predict: 100, temperature: 0.1, ...request.options },
       };
 
-      // Make request to OLLAMA server
+      // adapt timeout for bigger LLM models
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        this.logger.warn(
+          `OLLAMA request timeout after 120s for user ${userId}`,
+        );
+        controller.abort();
+      }, 120000); // 2 minutes
+
       const ollamaResponse = await fetch(`${this.ollamaUrl}/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(ollamaPayload),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!ollamaResponse.ok) {
         this.logger.error(
@@ -66,13 +77,11 @@ export class OllamaService {
         );
       }
 
-      // Set headers for streaming response
       response.setHeader("Content-Type", "text/plain");
       response.setHeader("Transfer-Encoding", "chunked");
       response.setHeader("Cache-Control", "no-cache");
       response.setHeader("Connection", "keep-alive");
 
-      // Stream the response from OLLAMA to the client
       const reader = ollamaResponse.body.getReader();
       const decoder = new TextDecoder();
 
@@ -141,7 +150,7 @@ export class OllamaService {
   async checkHealth(): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s pour health check
 
       const response = await fetch(`${this.ollamaUrl}/api/tags`, {
         method: "GET",
