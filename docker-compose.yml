@@ -1,0 +1,229 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gpt-postgres
+    env_file:
+      - ./.env
+      - ./.env.secrets
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+    ports:
+      - "8989:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: apache/kafka:4.0.1-rc2
+    container_name: gpt-kafka
+    # Un seul broker, KRaft, listeners internes+externes (ports distincts)
+    env_file:
+      - ./.env
+    environment:
+      KAFKA_PROCESS_ROLES: ${KAFKA_PROCESS_ROLES}
+      KAFKA_NODE_ID: ${KAFKA_NODE_ID}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_CONTROLLER_LISTENER_NAMES: ${KAFKA_CONTROLLER_LISTENER_NAMES}
+      KAFKA_CONTROLLER_QUORUM_VOTERS: ${KAFKA_CONTROLLER_QUORUM_VOTERS}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS}
+      KAFKA_CLUSTER_ID: ${KAFKA_CLUSTER_ID}
+    ports:
+      - "9092:29092" # host:container (EXTERNAL listener)
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "kafka-topics --bootstrap-server localhost:29092 --list >/dev/null 2>&1 || exit 1",
+        ]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: gpt-ollama
+    ports:
+      - "11434:11434"
+    env_file:
+      - ./.env
+    environment:
+      OLLAMA_HOST: ${OLLAMA_HOST_BIND}
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/bin/ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: gpt-ollama-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      OLLAMA_HOST: ${OLLAMA_INTERNAL_URL}
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ollama pull ${OLLAMA_MODEL} && echo 'Model pull completed'"]
+    restart: "no"
+
+  kafka-init:
+    image: apache/kafka:4.0.1-rc2
+    container_name: gpt-kafka-init
+    depends_on:
+      kafka:
+        condition: service_started
+    env_file:
+      - ./.env
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Waiting for Kafka to be ready..."
+        sleep 10
+        echo "Creating topics..."
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic input.created --partitions 1 --replication-factor 1
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic output.created --partitions 1 --replication-factor 1
+        echo "Topics created successfully"
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list
+    restart: "no"
+
+  gpt-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: gpt-gateway
+    env_file:
+      - ./.env
+      - ./.env.secrets
+    environment:
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      FRONT_END_URL: ${FRONT_END_URL}
+      API_SERVICE_URL: ${API_SERVICE_URL}
+      KAFKA_PRODUCER_URL: ${KAFKA_PRODUCER_URL}
+      KAFKA_CONSUMER_URL: ${KAFKA_CONSUMER_URL}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      DB_LOGGING: ${DB_LOGGING}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+
+  gpt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: gpt-api
+    env_file:
+      - ./.env
+      - ./.env.secrets
+    environment:
+      API_PORT: ${API_PORT}
+      API_HOST: ${API_HOST}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      DB_LOGGING: ${DB_LOGGING}
+      NODE_ENV: ${NODE_ENV}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gpt-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.producer
+    container_name: gpt-producer
+    env_file:
+      - ./.env
+      - ./.env.secrets
+    environment:
+      - PRODUCER_PORT=${PRODUCER_PORT}
+      - FRONT_END_URL=${FRONT_END_URL}
+      # Compat actuel + prêt pour cluster ultérieur
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - KAFKA_BROKERS=${KAFKA_BROKERS}
+    depends_on:
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
+
+  gpt-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    container_name: gpt-consumer
+    env_file:
+      - ./.env
+      - ./.env.secrets
+    environment:
+      CONSUMER_PORT: ${CONSUMER_PORT}
+      KAFKA_CONSUMER_GROUP_ID: ${KAFKA_CONSUMER_GROUP_ID}
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
+
+  gpt-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        # VITE_DEV_BEARER_TOKEN removed - should not be baked into image
+    container_name: gpt-ui
+    ports:
+      - "5173:80"
+    depends_on:
+      gpt-gateway:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  kafka_data:
+  ollama_data:

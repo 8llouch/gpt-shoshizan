@@ -1,0 +1,32 @@
+# Monorepo-aware Dockerfile for gpt-gateway
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY shared-interfaces ./shared-interfaces
+COPY gpt-gateway/package.json ./gpt-gateway/package.json
+RUN npm ci -w gpt-gateway --omit=dev
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN npm ci
+RUN npm run build -w gpt-gateway
+
+FROM node:20-alpine AS runner
+WORKDIR /app/gpt-gateway
+ENV NODE_ENV=production
+RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
+# node_modules + workspace node_modules
+COPY --from=deps /app/node_modules /app/node_modules
+COPY --from=deps /app/gpt-gateway/node_modules ./node_modules
+# shared-interfaces (pour les symlinks npm workspaces)
+COPY --from=builder /app/shared-interfaces /app/shared-interfaces
+# artefacts
+COPY --from=builder /app/gpt-gateway/dist ./dist
+COPY --from=builder /app/gpt-gateway/package.json ./package.json
+RUN apk add --no-cache curl
+USER nestjs
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/gateway/health || exit 1
+CMD ["node", "dist/main"]

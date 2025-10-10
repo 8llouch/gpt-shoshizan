@@ -1,0 +1,30 @@
+# Monorepo-aware Dockerfile for gpt-kafka-producer
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY shared-interfaces ./shared-interfaces
+COPY gpt-kafka-producer/package.json ./gpt-kafka-producer/package.json
+RUN npm ci -w gpt-kafka-producer --omit=dev
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN npm ci
+RUN npm run build -w gpt-kafka-producer
+
+FROM node:20-alpine AS runner
+WORKDIR /app/gpt-kafka-producer
+ENV NODE_ENV=production
+RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
+COPY --from=deps /app/node_modules /app/node_modules
+COPY --from=deps /app/gpt-kafka-producer/node_modules ./node_modules
+COPY --from=builder /app/shared-interfaces /app/shared-interfaces
+COPY --from=builder /app/gpt-kafka-producer/dist ./dist
+COPY --from=builder /app/gpt-kafka-producer/package.json ./package.json
+RUN apk add --no-cache curl
+USER nestjs
+EXPOSE 3002
+# Kafka cluster prêt: passe KAFKA_BROKERS="broker1:9092,broker2:9092,broker3:9092" au runtime
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:3002/health || exit 1
+CMD ["node", "dist/main"]
