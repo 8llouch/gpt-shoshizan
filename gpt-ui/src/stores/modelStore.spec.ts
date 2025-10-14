@@ -9,7 +9,8 @@ beforeEach(() => {
 describe('modelStore', () => {
   it('initial state is correct', () => {
     const store = useModelStore()
-    expect(store.selectedModel).toBe('llama3.2')
+    expect(store.selectedModel).toBeNull()
+    expect(store.models).toEqual([])
   })
 
   it('setSelectedModel updates model', () => {
@@ -18,24 +19,27 @@ describe('modelStore', () => {
     expect(store.selectedModel).toBe('test-model')
   })
 
-  it('reset sets model to default', () => {
+  it('reset sets model to first available', () => {
     const store = useModelStore()
+    store.models = [{ name: 'Test Model', model: 'test:latest' }]
     store.setSelectedModel('other')
     store.reset()
-    expect(store.selectedModel).toBe('llama3.2')
+    expect(store.selectedModel).toBe('test:latest')
   })
 
-  it('getSelectedModel computed', () => {
+  it('selectedModel computed returns current value', () => {
     const store = useModelStore()
-    expect(store.getSelectedModel).toBe('llama3.2')
+    expect(store.selectedModel).toBeNull()
     store.setSelectedModel('foo')
-    expect(store.getSelectedModel).toBe('foo')
+    expect(store.selectedModel).toBe('foo')
   })
 
   it('selectedModelName computed', () => {
     const store = useModelStore()
-    expect(typeof store.selectedModelName).toBe('string')
-    store.setSelectedModel('llama3.2')
-    expect(store.selectedModelName).toBeDefined()
+    expect(store.selectedModelName).toBe('')
+    store.setSelectedModel('test-model')
+    expect(store.selectedModelName).toBe('test-model')
+    store.models = [{ name: 'Test Model', model: 'test-model' }]
+    expect(store.selectedModelName).toBe('Test Model')
   })
 })

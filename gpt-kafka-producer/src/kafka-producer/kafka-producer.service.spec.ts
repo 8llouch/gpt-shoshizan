@@ -65,7 +65,6 @@ describe('KafkaProducerService', () => {
         timestamp: new Date().toISOString(),
       };
 
-      // First two calls fail, third succeeds
       mockKafkaConfigService.sendMessage
         .mockRejectedValueOnce(new Error('First attempt failed'))
         .mockRejectedValueOnce(new Error('Second attempt failed'))

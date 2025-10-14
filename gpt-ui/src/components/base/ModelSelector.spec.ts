@@ -7,6 +7,9 @@ vi.mock('../../stores/modelStore', () => ({
   useModelStore: () => ({
     selectedModel: 'test-model',
     setSelectedModel: vi.fn(),
+    fetchModels: vi.fn(),
+    models: [],
+    selectedModelName: 'test-model',
   }),
 }))
 

@@ -11,6 +11,13 @@ vi.mock('./apiStore', () => ({ useApiStore: () => ({ reset: vi.fn() }) }))
 vi.mock('./modelStore', () => ({ useModelStore: () => ({ reset: vi.fn() }) }))
 vi.mock('./themeStore', () => ({ useThemeStore: () => ({ reset: vi.fn() }) }))
 
+// Mock du router pour éviter l'erreur "history is not defined"
+vi.mock('../router', () => ({
+  default: {
+    push: vi.fn(),
+  },
+}))
+
 global.localStorage = {
   getItem: vi.fn(() => null),
   setItem: vi.fn(),

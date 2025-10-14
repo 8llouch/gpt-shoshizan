@@ -23,10 +23,10 @@ describe('ApiService', () => {
   })
 
   it('should throw if fetch fails', async () => {
-    globalAny.fetch.mockResolvedValue({ ok: false, statusText: 'Error', body: {} })
+    globalAny.fetch.mockResolvedValue({ ok: false, status: 500, statusText: 'Error', body: {} })
     await expect(
       ApiService.sendRequest({ conversationId: '1', model: 'test', prompt: 'hi' } as ApiRequest),
-    ).rejects.toThrow('Failed to get response from Ollama: Error')
+    ).rejects.toThrow('HTTP 500: Error')
   })
 
   it('should throw if no response body', async () => {

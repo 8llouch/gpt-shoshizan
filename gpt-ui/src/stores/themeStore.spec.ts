@@ -35,7 +35,6 @@ beforeEach(() => {
     fn()
     return 0
   }) as typeof setTimeout
-  // Add __promisify__ property to satisfy Node.js typings
   ;(mockSetTimeout as any).__promisify__ = () => Promise.resolve()
   global.setTimeout = mockSetTimeout
 })

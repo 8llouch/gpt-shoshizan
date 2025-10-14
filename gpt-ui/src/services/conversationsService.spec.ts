@@ -29,9 +29,9 @@ describe('ConversationsService', () => {
 
   it('generateConversationId error', async () => {
     const mockFetch = fetch as ReturnType<typeof vi.fn>
-    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
+    mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: 'fail' })
     await expect(ConversationsService.generateConversationId()).rejects.toThrow(
-      'Failed to generate conversation ID: fail',
+      'HTTP 500: fail',
     )
   })
 
@@ -48,9 +48,9 @@ describe('ConversationsService', () => {
 
   it('getConversations error', async () => {
     const mockFetch = fetch as ReturnType<typeof vi.fn>
-    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
+    mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: 'fail' })
     await expect(ConversationsService.getConversations()).rejects.toThrow(
-      'Failed to fetch conversations: fail',
+      'HTTP 500: fail',
     )
   })
 
@@ -62,9 +62,9 @@ describe('ConversationsService', () => {
 
   it('deleteConversation error', async () => {
     const mockFetch = fetch as ReturnType<typeof vi.fn>
-    mockFetch.mockResolvedValue({ ok: false, statusText: 'fail' })
+    mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: 'fail' })
     await expect(ConversationsService.deleteConversation('1')).rejects.toThrow(
-      'Failed to delete conversation: fail',
+      'HTTP 500: fail',
     )
   })
 })

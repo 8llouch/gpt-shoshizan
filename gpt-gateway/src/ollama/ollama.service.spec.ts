@@ -128,8 +128,9 @@ describe("OllamaService", () => {
           system: mockRequest.system,
           template: mockRequest.template,
           images: mockRequest.images,
-          options: mockRequest.options,
+          options: { num_predict: 100, ...mockRequest.options },
         }),
+        signal: expect.any(Object),
       });
 
       expect(mockResponse.setHeader).toHaveBeenCalledWith("Content-Type", "text/plain");

@@ -19,6 +19,14 @@ vi.mock('./components/base/ThemeSwitcher.vue', () => ({
   },
 }))
 
+vi.mock('./components/ServiceStartupLoader.vue', () => ({
+  default: {
+    name: 'ServiceStartupLoader',
+    template: '<div data-testid="service-loader"></div>',
+    emits: ['ready'],
+  },
+}))
+
 describe('App.vue', () => {
   let router: Router
   let i18n: I18n
@@ -51,12 +59,16 @@ describe('App.vue', () => {
     })
   })
 
-  it('renders the app structure correctly', () => {
+  it('renders the app structure correctly', async () => {
     const wrapper = mount(App, {
       global: {
         plugins: [createPinia(), router, i18n],
       },
     })
+
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.find('[data-testid="theme-provider"]').exists()).toBe(true)
 
@@ -72,6 +84,10 @@ describe('App.vue', () => {
       },
     })
 
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
+
     await router.push('/')
     await wrapper.vm.$nextTick()
 
@@ -84,6 +100,10 @@ describe('App.vue', () => {
         plugins: [createPinia(), router, i18n],
       },
     })
+
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
 
     await router.push('/')
     await wrapper.vm.$nextTick()
@@ -101,6 +121,10 @@ describe('App.vue', () => {
         plugins: [createPinia(), router, i18n],
       },
     })
+
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.find('[data-testid="theme-provider"]').exists()).toBe(true)
 
@@ -120,6 +144,10 @@ describe('App.vue', () => {
       },
     })
 
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
+
     expect(wrapper.find('[data-testid="theme-switcher"]').exists()).toBe(true)
 
     await router.push('/')
@@ -131,12 +159,16 @@ describe('App.vue', () => {
     expect(wrapper.find('[data-testid="theme-switcher"]').exists()).toBe(true)
   })
 
-  it('has proper component structure', () => {
+  it('has proper component structure', async () => {
     const wrapper = mount(App, {
       global: {
         plugins: [createPinia(), router, i18n],
       },
     })
+
+    const loader = wrapper.findComponent({ name: 'ServiceStartupLoader' })
+    await loader.vm.$emit('ready')
+    await wrapper.vm.$nextTick()
 
     const themeProvider = wrapper.find('[data-testid="theme-provider"]')
     expect(themeProvider.exists()).toBe(true)

@@ -42,7 +42,6 @@ describe('KafkaConfigService', () => {
   describe('onModuleInit', () => {
     it('should connect to Kafka successfully', async () => {
       await service.onModuleInit();
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockProducer.connect).toHaveBeenCalled();
     });
 
@@ -61,7 +60,6 @@ describe('KafkaConfigService', () => {
     const testKey = 'test-key';
 
     it('should send message successfully', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result = await service.sendMessage(
         testTopic,
         testMessage,
@@ -72,9 +70,11 @@ describe('KafkaConfigService', () => {
       const expectedMessage: ProducerRecord = {
         topic: testTopic,
         messages: [{ key: testKey, value: JSON.stringify(testMessage) }],
+        acks: -1,
+        timeout: 30000,
+        compression: 1,
       };
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockProducer.send).toHaveBeenCalledWith(expectedMessage);
       expect(result).toEqual([
         { topicName: 'test-topic', partition: 0, errorCode: 0 },

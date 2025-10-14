@@ -11,6 +11,14 @@ describe("OllamaController", () => {
   let service: jest.Mocked<OllamaService>;
   let mockResponse: Partial<Response>;
 
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   beforeEach(async () => {
     const mockService = {
       generateResponse: jest.fn(),
@@ -84,7 +92,7 @@ describe("OllamaController", () => {
       const error = new Error("OLLAMA service error");
       service.generateResponse.mockRejectedValue(error);
 
-      // Properly setup response mock
+
       const mockResponseObj = {
         headersSent: false,
         status: jest.fn().mockReturnThis(),
