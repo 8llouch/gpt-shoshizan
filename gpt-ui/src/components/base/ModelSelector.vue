@@ -1,13 +1,18 @@
 <script setup lang="ts">
+
 import { useI18n } from 'vue-i18n'
 import { useModelStore } from '../../stores/modelStore'
-import { MODEL_OPTIONS } from '../../constants'
+import { onMounted } from 'vue'
 
 const { t } = useI18n()
 const modelStore = useModelStore()
 
 defineOptions({
   name: 'ModelSelector',
+})
+
+onMounted(() => {
+  modelStore.fetchModels()
 })
 
 const handleModelChange = (event: Event) => {
@@ -29,12 +34,12 @@ const handleModelChange = (event: Event) => {
       data-testid="model-select"
     >
       <option
-        v-for="option in MODEL_OPTIONS"
-        :key="option.value"
-        :value="option.value"
-        :data-testid="`model-option-${option.value}`"
+        v-for="model in modelStore.models"
+        :key="model.model"
+        :value="model.model"
+        :data-testid="`model-option-${model.model}`"
       >
-        {{ option.text }}
+        {{ model.name }}{{ model.details?.parameter_size ? ` (${model.details.parameter_size})` : '' }}
       </option>
     </select>
   </div>
