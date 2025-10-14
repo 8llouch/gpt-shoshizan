@@ -62,9 +62,17 @@ services:
       - ./.env
     environment:
       OLLAMA_HOST: ${OLLAMA_HOST_BIND}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE}
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+        reservations:
+          memory: 10G
     healthcheck:
       test: ["CMD", "/bin/ollama", "list"]
       interval: 10s
@@ -83,7 +91,27 @@ services:
     environment:
       OLLAMA_HOST: ${OLLAMA_INTERNAL_URL}
     entrypoint: ["/bin/sh", "-c"]
-    command: ["ollama pull ${OLLAMA_MODEL} && echo 'Model pull completed'"]
+    command:
+      - |
+        echo "Starting to pull and preload models from OLLAMA_MODELS: $${OLLAMA_MODELS}"
+        OLD_IFS="$$IFS"
+        IFS=','
+        for model in $${OLLAMA_MODELS}; do
+          echo "Pulling model: $$model"
+          ollama pull $$model || echo "Failed to pull $$model, continuing..."
+        done
+        IFS="$$OLD_IFS"
+        echo "All models pulled successfully"
+        
+        echo "Preloading models into memory..."
+        IFS=','
+        for model in $${OLLAMA_MODELS}; do
+          echo "Preloading model into memory: $$model"
+          ollama run $$model "Hello" --verbose || echo "Failed to preload $$model, continuing..."
+          echo "Model $$model preloaded"
+        done
+        IFS="$$OLD_IFS"
+        echo "All models preloaded into memory"
     restart: "no"
 
   kafka-init:

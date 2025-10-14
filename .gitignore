@@ -7,3 +7,4 @@ secrets/
 *.secret
 *.key
 .env
+IMPROVMENTS.MD
