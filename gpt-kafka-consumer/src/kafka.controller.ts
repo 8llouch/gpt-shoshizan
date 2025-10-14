@@ -68,12 +68,11 @@ export class KafkaController {
         this.logger.log(
           `Conversation with ID ${data.conversationId} not found, creating it for AI response`,
         );
-        // Create conversation for AI response if it doesn't exist
         conversation = await this.conversationService.createConversation(
           data.conversationId,
-          undefined, // no system prompt from AI response
-          undefined, // no model options from AI response
-          undefined, // no user ID from AI response
+          undefined,
+          undefined,
+          undefined,
         );
         this.logger.log(
           'Conversation created for AI response: ',

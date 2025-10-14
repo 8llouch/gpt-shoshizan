@@ -33,7 +33,6 @@ async function bootstrap() {
   // Start HTTP server
   const port = process.env.GATEWAY_PORT || 3000;
   await app.listen(port);
-  console.log(`Gateway service is running on port ${port}`);
 }
 bootstrap().catch((error) => {
   console.error("Error starting application:", error);

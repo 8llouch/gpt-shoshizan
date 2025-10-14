@@ -18,7 +18,6 @@ export class AuthenticationService {
       }
 
       const data = await response.json()
-      console.log(data)
       return data.token
     } catch (error) {
       console.error('Error during login:', error)

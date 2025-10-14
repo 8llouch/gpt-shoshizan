@@ -7,8 +7,20 @@ vi.mock('../services/apiService', () => ({
   ApiService: { sendRequest: vi.fn() },
 }))
 
+const mockModelStore = {
+  selectedModel: 'test-model' as string | null,
+  models: [],
+}
+
+vi.mock('./modelStore', () => ({
+  useModelStore: () => mockModelStore,
+}))
+
 beforeEach(() => {
   setActivePinia(createPinia())
+  // Reset du mock avant chaque test
+  mockModelStore.selectedModel = 'test-model'
+  mockModelStore.models = []
 })
 
 describe('apiStore', () => {
@@ -16,6 +28,17 @@ describe('apiStore', () => {
     const store = useApiStore()
     expect(store.isLoading).toBeDefined()
     expect(store.error).toBeNull()
+  })
+
+  it('sendMessage throws error when no model is selected', async () => {
+    // Modifier temporairement le mock pour simuler l'absence de modèle
+    mockModelStore.selectedModel = null
+
+    const store = useApiStore()
+    await expect(store.sendMessage('msg', 'id')).rejects.toThrow(
+      'No model selected. Please select a model first.'
+    )
+    expect(store.error).toBe('No model selected. Please select a model first.')
   })
 
   it('sendMessage handles error', async () => {

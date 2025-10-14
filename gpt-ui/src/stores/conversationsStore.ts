@@ -162,14 +162,12 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     const modelStore = useModelStore()
 
     try {
-      // Clear previous response to avoid confusion
       apiStore.resetCurrentResponse()
 
       const result = await apiStore.sendMessage(content, conversation.id, {
         conversationContext: conversation.context || undefined,
       })
 
-      // Add assistant response
       if (apiStore.currentResponse) {
         addMessage(
           conversation.id,
@@ -181,7 +179,6 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
         addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
       }
 
-      // Update conversation context with the new context from the response
       if (result && result.context) {
         updateConversationContext(conversation.id, result.context)
       }
@@ -209,13 +206,11 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     const conversationIndex = conversations.value.findIndex((c) => c.id === conversation.id)
     if (conversationIndex === -1) return
 
-    // Remove last assistant message with proper reactivity
     const messages = [...conversation.messages]
     const lastAssistantIndex = messages.map((m) => m.role).lastIndexOf('assistant')
 
     if (lastAssistantIndex !== -1) {
       messages.splice(lastAssistantIndex, 1)
-      // Update conversation with new messages array
       conversations.value[conversationIndex] = {
         ...conversation,
         messages: messages,
@@ -245,7 +240,6 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
         addMessage(conversation.id, result.response, 'assistant', modelStore.selectedModelName)
       }
 
-      // Update conversation context with the new context from the response
       if (result && result.context) {
         updateConversationContext(conversation.id, result.context)
       }
@@ -270,7 +264,6 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
     currentConversationId.value = conversationId
     const apiStore = useApiStore()
 
-    // Restore context from the selected conversation
     const conversation = conversations.value.find((conv) => conv.id === conversationId)
     if (conversation && conversation.context) {
       apiStore.setContext(conversation.context)
@@ -329,7 +322,6 @@ export const useConversationsStore = defineStore('conversationsStore', () => {
       }
     } else if (!currentConversationId.value) {
       currentConversationId.value = conversations.value[0].id
-      // Restore context for the first conversation
       const firstConversation = conversations.value[0]
       if (firstConversation.context) {
         const apiStore = useApiStore()

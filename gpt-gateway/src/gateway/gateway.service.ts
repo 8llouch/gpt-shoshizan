@@ -12,14 +12,12 @@ export class GatewayService {
     private readonly configService: ConfigService,
     private readonly ollamaService: OllamaService,
   ) {
-    // API service client
     this.apiClient = axios.create({
       baseURL:
         this.configService.get("API_SERVICE_URL") || "http://localhost:3001",
       timeout: 10000,
     });
 
-    // Kafka Producer service client
     this.kafkaProducerClient = axios.create({
       baseURL:
         this.configService.get("KAFKA_PRODUCER_URL") || "http://localhost:3002",
@@ -27,7 +25,6 @@ export class GatewayService {
     });
   }
 
-  // Route to API service
   async routeToApi(
     path: string,
     method: string,
@@ -51,7 +48,6 @@ export class GatewayService {
     }
   }
 
-  // Route to Kafka Producer service
   async routeToKafkaProducer(
     path: string,
     method: string,
@@ -75,7 +71,6 @@ export class GatewayService {
     }
   }
 
-  // Health check for all services
   async healthCheck(): Promise<{
     gateway: string;
     api: string;

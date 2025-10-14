@@ -27,7 +27,6 @@ export class OllamaService {
         `Processing OLLAMA request for user ${userId}, model: ${request.model}`,
       );
 
-      // Prepare the request payload for OLLAMA
       const ollamaPayload = {
         model: request.model,
         prompt: request.prompt,
@@ -39,14 +38,13 @@ export class OllamaService {
         options: { num_predict: 100, temperature: 0.1, ...request.options },
       };
 
-      // adapt timeout for bigger LLM models
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         this.logger.warn(
           `OLLAMA request timeout after 120s for user ${userId}`,
         );
         controller.abort();
-      }, 120000); // 2 minutes
+      }, 120000);
 
       const ollamaResponse = await fetch(`${this.ollamaUrl}/api/generate`, {
         method: "POST",
@@ -95,7 +93,6 @@ export class OllamaService {
 
           for (const line of lines) {
             try {
-              // Validate JSON before sending
               JSON.parse(line);
               response.write(line + "\n");
             } catch {
@@ -150,7 +147,7 @@ export class OllamaService {
   async checkHealth(): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s pour health check
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(`${this.ollamaUrl}/api/tags`, {
         method: "GET",

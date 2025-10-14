@@ -70,6 +70,12 @@ export const useApiStore = defineStore('apiStore', () => {
     const modelStore = useModelStore()
     const selectedModel = modelStore.selectedModel
 
+    if (!selectedModel) {
+      const errorMessage = 'No model selected. Please select a model first.'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    }
+
     try {
       startRequest()
 

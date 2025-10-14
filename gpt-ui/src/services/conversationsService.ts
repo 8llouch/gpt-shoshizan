@@ -84,7 +84,7 @@ export class ConversationsService {
         headers.Authorization = authHeaders.Authorization
       }
 
-      const response = await ApiErrorHandler.fetchWithErrorHandling(
+      await ApiErrorHandler.fetchWithErrorHandling(
         `${ConversationsService.CONVERSATIONS_API_URL}/${id}`,
         {
           method: 'DELETE',
@@ -92,7 +92,6 @@ export class ConversationsService {
         },
       )
 
-      console.log(`Successfully deleted conversation ${id}`)
     } catch (error) {
       console.error('Error deleting conversation:', error)
 
