@@ -35,7 +35,11 @@ const handleLogin = async () => {
   try {
     await authStore.login(loginForm.email, loginForm.password)
     await conversationsStore.loadConversations()
-    conversationsStore.currentConversationId = conversationsStore.conversations[0].id
+
+    if (conversationsStore.conversations.length > 0) {
+      conversationsStore.currentConversationId = conversationsStore.conversations[0].id
+    }
+
     router.push('/chat')
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Login failed'
@@ -60,7 +64,6 @@ const handleRegister = async () => {
 
   try {
     await authStore.register(registerForm.email, registerForm.password, registerForm.name)
-    // Switch to login mode after successful registration
     isLoginMode.value = true
     errorMessage.value = 'Registration successful! Please log in.'
   } catch (error) {
