@@ -56,7 +56,19 @@
     "docker:logs:ui": "docker-compose logs -f gpt-ui",
     "docker:logs:gateway": "docker-compose logs -f gpt-gateway",
     "docker:logs:api": "docker-compose logs -f gpt-api",
-    "docker:logs:ollama": "docker-compose logs -f ollama"
+    "docker:logs:ollama": "docker-compose logs -f ollama",
+    "observability:start": "docker-compose up -d otel-collector jaeger prometheus grafana",
+    "observability:stop": "docker-compose stop otel-collector jaeger prometheus grafana",
+    "observability:restart": "npm run observability:stop && npm run observability:start",
+    "observability:logs": "docker-compose logs -f otel-collector jaeger prometheus grafana",
+    "observability:logs:otel": "docker logs -f gpt-otel-collector",
+    "observability:logs:jaeger": "docker logs -f gpt-jaeger",
+    "observability:logs:prometheus": "docker logs -f gpt-prometheus",
+    "observability:logs:grafana": "docker logs -f gpt-grafana",
+    "observability:clean": "docker-compose down otel-collector jaeger prometheus grafana && docker volume rm gpt-shoshizan_prometheus_data gpt-shoshizan_grafana_data 2>/dev/null || true",
+    "observability:open:jaeger": "open http://localhost:16686",
+    "observability:open:prometheus": "open http://localhost:9090",
+    "observability:open:grafana": "open http://localhost:3100"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
