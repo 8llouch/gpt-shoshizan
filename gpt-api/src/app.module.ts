@@ -8,6 +8,7 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './authentication/authentication.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -27,6 +28,9 @@ import { AuthModule } from './authentication/authentication.module';
     }),
     ConversationsModule,
     AuthModule,
+    MetricsModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  // TracingMiddleware removed - HTTP auto-instrumentation handles it
+}
