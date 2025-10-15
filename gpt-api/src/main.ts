@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { initializeTracing } from './tracing/tracer';
+
+// Initialize OpenTelemetry before creating NestJS application
+initializeTracing();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
