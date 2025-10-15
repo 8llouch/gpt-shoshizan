@@ -10,6 +10,7 @@ import { GatewayModule } from "./gateway/gateway.module";
 import { OllamaModule } from "./ollama/ollama.module";
 import { UserEntity } from "@shoshizan/shared-interfaces";
 import { CommonModule } from "./common/common.module";
+import { MetricsModule } from "./metrics/metrics.module";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CommonModule } from "./common/common.module";
     GatewayModule,
     OllamaModule,
     CommonModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
