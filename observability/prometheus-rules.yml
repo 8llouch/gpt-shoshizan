@@ -1,0 +1,149 @@
+# Prometheus Alert Rules for GPT-Shoshizan
+# These rules define when to trigger alerts based on metrics
+
+groups:
+  - name: service_health
+    interval: 30s
+    rules:
+      # Alert when a service is down
+      - alert: ServiceDown
+        expr: up{job=~"gpt-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been down for more than 1 minute"
+
+      # Alert on high error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(http_server_errors_total[5m]) / 
+            rate(http_server_requests_total[5m])
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: errors
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+  - name: performance
+    interval: 30s
+    rules:
+      # Alert on high latency (P95 > 1s)
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, 
+            rate(http_server_duration_bucket[5m])
+          ) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High latency on {{ $labels.service }}"
+          description: "P95 latency is {{ $value }}ms (threshold: 1000ms)"
+
+      # Alert on high CPU usage
+      - alert: HighCPUUsage
+        expr: |
+          (
+            rate(process_cpu_seconds_total[5m])
+          ) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High CPU usage on {{ $labels.service }}"
+          description: "CPU usage is {{ $value | humanizePercentage }}"
+
+  - name: kafka
+    interval: 30s
+    rules:
+      # Alert on Kafka consumer lag
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+          category: messaging
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Consumer lag is {{ $value }} messages"
+
+      # Alert on Kafka message failures
+      - alert: KafkaMessageFailures
+        expr: |
+          rate(kafka_messages_failed_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          category: messaging
+        annotations:
+          summary: "Kafka message failures detected"
+          description: "{{ $value }} messages/sec are failing"
+
+  - name: database
+    interval: 30s
+    rules:
+      # Alert on high database connection usage
+      - alert: HighDatabaseConnections
+        expr: |
+          (
+            db_connections_active / 
+            db_connections_max
+          ) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "High database connection usage"
+          description: "Database connections at {{ $value | humanizePercentage }}"
+
+      # Alert on slow queries
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            rate(db_query_duration_bucket[5m])
+          ) > 500
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "P95 query duration is {{ $value }}ms"
+
+  - name: ollama
+    interval: 30s
+    rules:
+      # Alert on Ollama service unavailability
+      - alert: OllamaServiceDown
+        expr: up{job="ollama"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: ai
+        annotations:
+          summary: "Ollama AI service is down"
+          description: "Ollama has been unreachable for more than 2 minutes"
+
+      # Alert on high AI model latency
+      - alert: HighAIModelLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(ai_model_generation_duration_bucket[5m])
+          ) > 5000
+        for: 5m
+        labels:
+          severity: warning
+          category: ai
+        annotations:
+          summary: "High AI model latency"
+          description: "P95 model generation time is {{ $value }}ms"
