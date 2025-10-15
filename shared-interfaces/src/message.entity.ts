@@ -1,7 +1,17 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { ConversationEntity } from "./conversation.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ConversationEntity } from './conversation.entity';
 
-@Entity()
+@Entity('message')
+@Index(['conversation', 'createdAt'])
+@Index(['role']) 
+@Index(['createdAt'])
 export class MessageEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;

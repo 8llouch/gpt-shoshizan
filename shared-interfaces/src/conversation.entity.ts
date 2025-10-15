@@ -1,9 +1,11 @@
-import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
 import { MessageEntity } from "./message.entity";
 import { UserEntity } from "./user.entity";
 import { ModelOptions } from ".";
 
 @Entity()
+@Index(['userId', 'createdAt']) 
+@Index(['updatedAt']) 
 export class ConversationEntity {
   @PrimaryColumn()
   id: string;
