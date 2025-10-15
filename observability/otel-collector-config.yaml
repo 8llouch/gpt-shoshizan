@@ -1,0 +1,123 @@
+# OpenTelemetry Collector Configuration
+# Receives telemetry from services and exports to Jaeger/Prometheus
+
+receivers:
+  # OTLP receiver for traces and metrics
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:5173"
+            - "http://localhost:3000"
+          allowed_headers:
+            - "*"
+
+  # Prometheus receiver for scraping metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 10s
+          static_configs:
+            - targets: ['localhost:8888']
+
+processors:
+  # Batch processor to reduce number of outgoing connections
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # Resource processor to add service metadata
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: "development"
+        action: upsert
+      - key: service.namespace
+        value: "gpt-shoshizan"
+        action: upsert
+
+  # Span processor to add custom attributes
+  span:
+    name:
+      to_attributes:
+        rules:
+          - ^\/api\/(?P<api_version>.*)\/(?P<endpoint>.*)$
+
+exporters:
+  # Jaeger exporter for traces
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Prometheus exporter for metrics
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: gpt_shoshizan
+    const_labels:
+      environment: development
+
+  # Logging exporter for debugging (disable in production)
+  logging:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+  # Prometheus Remote Write (optional - for long-term storage)
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+    tls:
+      insecure: true
+
+extensions:
+  # Health check extension
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  # pprof extension for performance profiling
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+  # zpages extension for debugging
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+service:
+  extensions: [health_check, pprof, zpages]
+  
+  pipelines:
+    # Traces pipeline (tail_sampling removed for 100% sampling during testing)
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlp/jaeger, logging]
+    
+    # Metrics pipeline
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, resource, batch]
+      exporters: [prometheus, prometheusremotewrite, logging]
+    
+    # Logs pipeline (optional)
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [logging]
+
+  telemetry:
+    logs:
+      level: "info"
+    metrics:
+      level: detailed
+      address: 0.0.0.0:8888
