@@ -8,3 +8,7 @@ secrets/
 *.key
 .env
 IMPROVMENTS.MD
+.github
+OPENTELEMETRY_STRATEGY.md
+observability/start-observability.sh
+observability/test-trace-propagation.sh
