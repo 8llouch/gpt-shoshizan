@@ -32,6 +32,7 @@ export class GatewayService {
     headers?: Record<string, string | undefined>,
   ): Promise<unknown> {
     try {
+      // HttpInstrumentation automatically propagates W3C Trace Context headers
       const response: AxiosResponse = await this.apiClient.request({
         method,
         url: path,
@@ -55,6 +56,7 @@ export class GatewayService {
     headers?: Record<string, string | undefined>,
   ): Promise<unknown> {
     try {
+      // HttpInstrumentation automatically propagates W3C Trace Context headers
       const response: AxiosResponse = await this.kafkaProducerClient.request({
         method,
         url: path,
