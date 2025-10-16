@@ -12,3 +12,6 @@ IMPROVMENTS.MD
 OPENTELEMETRY_STRATEGY.md
 observability/start-observability.sh
 observability/test-trace-propagation.sh
+
+# Coverage reports
+COVERAGE_REPORT_*.md
