@@ -7,6 +7,7 @@ import { UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { UserEntity } from "@shoshizan/shared-interfaces";
 import { RegisterDto, LoginDto } from "./dto/authentication.dto";
+import { SecureStringService } from "../common/security/secure-string.service";
 
 jest.mock("bcrypt");
 
@@ -14,6 +15,7 @@ describe("AuthService", () => {
   let service: AuthService;
   let userRepository: jest.Mocked<Repository<UserEntity>>;
   let jwtService: jest.Mocked<JwtService>;
+  let secureStringService: jest.Mocked<SecureStringService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,12 +35,21 @@ describe("AuthService", () => {
             sign: jest.fn(),
           },
         },
+        {
+          provide: SecureStringService,
+          useValue: {
+            withSecurePassword: jest.fn((password, operation) => operation(password)),
+            cleanSensitiveObject: jest.fn(),
+            zeroMemory: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     userRepository = module.get<jest.Mocked<Repository<UserEntity>>>(getRepositoryToken(UserEntity));
     jwtService = module.get<jest.Mocked<JwtService>>(JwtService);
+    secureStringService = module.get<jest.Mocked<SecureStringService>>(SecureStringService);
   });
 
   it("should be defined", () => {

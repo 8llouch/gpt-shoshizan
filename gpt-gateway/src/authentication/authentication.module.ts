@@ -7,6 +7,7 @@ import { AuthService } from "./authentication.service";
 import { AuthController } from "./authentication.controller";
 import { JwtStrategy } from "../common/strategies/jwt.strategy";
 import { UserEntity } from "@shoshizan/shared-interfaces";
+import { CommonModule } from "../common/common.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserEntity } from "@shoshizan/shared-interfaces";
         signOptions: { expiresIn: "1d" },
       }),
     }),
+    CommonModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { UserEntity } from "@shoshizan/shared-interfaces";
 import { RegisterDto, LoginDto } from "./dto/authentication.dto";
+import { SecureStringService } from "../common/security/secure-string.service";
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
     private jwtService: JwtService,
+    private secureStringService: SecureStringService,
   ) {}
 
   async register(
@@ -26,7 +28,14 @@ export class AuthService {
       throw new UnauthorizedException("Email already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // 🔒 SECURITY: Hash password avec zeroing automatique de la mémoire
+    const hashedPassword = await this.secureStringService.withSecurePassword(
+      password,
+      async (pwd) => await bcrypt.hash(pwd, 10),
+    );
+
+    // 🔒 SECURITY: Nettoyer le DTO après usage (évite traces en mémoire)
+    this.secureStringService.cleanSensitiveObject(registerDto, ["password"]);
 
     const user = this.usersRepository.create({
       email,
@@ -59,10 +68,16 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await this.secureStringService.withSecurePassword(
+      password,
+      async (pwd) => await bcrypt.compare(pwd, user.password),
+    );
+
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid credentials");
     }
+
+    this.secureStringService.cleanSensitiveObject(loginDto, ["password"]);
 
     const token = this.jwtService.sign({
       sub: user.id,
