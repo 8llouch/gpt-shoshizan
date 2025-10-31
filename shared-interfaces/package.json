@@ -9,7 +9,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "typeorm": "^0.3.24",
+    "typeorm": "^0.3.26",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
